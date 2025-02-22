@@ -1,0 +1,12 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src/app",
+  "compilerOptions": {
+    "assets": [
+      {
+        "include": "languages/**/*",
+        "watchAssets": true
+      }
+    ]
+  }
+}
