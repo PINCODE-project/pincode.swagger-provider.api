@@ -5,10 +5,7 @@ WORKDIR /app
 COPY package.json ./
 COPY prisma ./prisma
 
-RUN apt-get update \
-	&& apt-get install -y openssl \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /var/cache/apt/*
+RUN apk add --no-cache openssl
 
 RUN yarn install --frozen-lockfile
 
