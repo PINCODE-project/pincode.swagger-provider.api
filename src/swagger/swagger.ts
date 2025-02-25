@@ -10,7 +10,7 @@ export const setupSwagger = (app: INestApplication) => {
     const logger = new Logger();
 
     const docName: string = `${configService.getOrThrow<string>("APP_NAME")} Documentation`;
-    const docDesc: string = "123";
+    const docDesc: string = "Сервис для объединения Swagger схем в одном месте";
     const docVersion: string = "1.0";
     const docPrefix: string = "/core/docs";
 

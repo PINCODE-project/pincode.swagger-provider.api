@@ -110,16 +110,24 @@ export class AuthService {
             return this.saveSession(req, user);
         }
 
-        user = await this.userService.create(
-            profile.email,
-            "",
-            profile.name,
-            profile.picture,
-            AuthMethod[profile.provider.toUpperCase()],
-            true,
-        );
+        console.log(user, account, profile);
 
-        if (!account) {
+        const userByEmail = await this.prismaService.user.findFirst({
+            where: {
+                email: profile.email,
+            },
+        });
+
+        if (!userByEmail) {
+            user = await this.userService.create(
+                profile.email,
+                "",
+                profile.name,
+                profile.picture,
+                AuthMethod[profile.provider.toUpperCase()],
+                true,
+            );
+
             await this.prismaService.account.create({
                 data: {
                     userId: user.id,
@@ -130,6 +138,19 @@ export class AuthService {
                     expiresAt: profile.expires_at,
                 },
             });
+        } else {
+            await this.prismaService.account.create({
+                data: {
+                    userId: userByEmail.id,
+                    type: "oauth",
+                    provider: profile.provider,
+                    accessToken: profile.access_token,
+                    refreshToken: profile.refresh_token,
+                    expiresAt: profile.expires_at,
+                },
+            });
+
+            return this.saveSession(req, userByEmail);
         }
 
         return this.saveSession(req, user);

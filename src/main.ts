@@ -1,7 +1,6 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
-import basicAuth from "express-basic-auth";
 import IORedis from "ioredis";
 import RedisStore from "connect-redis";
 import session from "express-session";
@@ -29,19 +28,9 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
     app.enableCors({
-        origin: "http://localhost:5001",
+        origin: ["http://localhost:5001", "https://swagger-provider.com"],
         credentials: true,
     });
-
-    app.use(
-        "/core/docs*",
-        basicAuth({
-            challenge: true,
-            users: {
-                Admin: "P@ssw0rd",
-            },
-        }),
-    );
 
     app.use(
         session({

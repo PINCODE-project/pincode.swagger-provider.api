@@ -14,7 +14,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Request, Response } from "express";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
@@ -31,18 +31,21 @@ export class AuthController {
         private readonly providerService: ProviderService,
     ) {}
 
+    @ApiOperation({ summary: "Регистрация пользователя" })
     @Post("register")
     @HttpCode(HttpStatus.OK)
     public async register(@Body() dto: RegisterDto) {
         return this.authService.register(dto);
     }
 
+    @ApiOperation({ summary: "Авторизация пользователя" })
     @Post("login")
     @HttpCode(HttpStatus.OK)
     public async login(@Req() req: Request, @Body() dto: LoginDto) {
         return this.authService.login(req, dto);
     }
 
+    @ApiOperation({ summary: "Авторизация через Oauth" })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/callback/:provider")
     public async callback(
@@ -55,12 +58,15 @@ export class AuthController {
             throw new BadRequestException("Не был предоставлен код авторизации.");
         }
 
+        console.log(code, req, provider);
+
         await this.authService.extractProfileFromCode(req, provider, code);
 
         console.log(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/dashboard`);
         return res.redirect(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/dashboard`);
     }
 
+    @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/connect/:provider")
     public async connect(@Param("provider") provider: string) {
@@ -71,6 +77,7 @@ export class AuthController {
         };
     }
 
+    @ApiOperation({ summary: "Выход из аккаунта" })
     @Post("logout")
     @HttpCode(HttpStatus.OK)
     public async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {

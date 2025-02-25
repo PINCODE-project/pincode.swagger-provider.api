@@ -70,6 +70,8 @@ export class BaseOAuthService {
             },
         });
 
+        console.log(userRequest);
+
         if (!userRequest.ok) {
             throw new UnauthorizedException(
                 `Не удалось получить пользователя с ${this.options.profile_url}. Проверьте правильность токена доступа.`,
@@ -79,8 +81,12 @@ export class BaseOAuthService {
         const user = await userRequest.json();
         const userData = await this.extractUserInfo(user);
 
+        console.log("USER", user);
+        console.log("userData", userData);
+
         return {
             ...userData,
+            id: user.id,
             access_token: tokens.access_token,
             refresh_token: tokens.refresh_token,
             expires_at: tokens.expires_at || tokens.expires_in,

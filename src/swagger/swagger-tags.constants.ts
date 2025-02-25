@@ -19,8 +19,4 @@ export const _SWAGGER_TAGS = [
         name: "microservice",
         description: "Работа с OpenApi схемами",
     },
-    {
-        name: "system",
-        description: "Системные функции",
-    },
 ];
