@@ -18,6 +18,7 @@ services: # Начало секции с сервисами
       context: ./
       dockerfile: Dockerfile
     restart: always
+    env_file: ".env"
     ports:
       - "9178:9001"
     networks:
