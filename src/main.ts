@@ -19,6 +19,8 @@ async function bootstrap() {
     const configService = app.get(ConfigService);
     const redis = new IORedis(configService.getOrThrow("REDIS_URI"), { keepAlive: 1000 });
 
+    console.log(configService.getOrThrow("REDIS_URI"));
+
     const port: number = configService.getOrThrow<number>("APPLICATION_PORT");
     const host: string = configService.getOrThrow<string>("APPLICATION_HOST");
     const globalPrefix: string = "/api";
