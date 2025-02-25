@@ -11,10 +11,22 @@ services: # Начало секции с сервисами
     volumes: # Настройка томов для хранения данных
       - redis_data:/data # Хранение данных Redis в томе redis_data
     networks: # Настройка сетей
-      - backend # Подключение к сети backend
+      - sp_network # Подключение к сети backend
+
+
+  sp_server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "9178:9001"
+    networks:
+      - sp_network
 
 volumes: # Определение томов
   redis_data: # Том для хранения данных Redis
 
-networks: # Определение сетей
-  backend # Сеть для внутреннего взаимодействия сервисов
+networks:
+  sp_network:
+    driver: bridge
