@@ -7,11 +7,6 @@ COPY prisma ./prisma
 
 RUN yarn install --frozen-lockfile
 
-RUN set -ex; \
-    apt-get update -y ; \
-    apt-get install -y --no-install-recommends \
-      openssl
-
 COPY . .
 
 EXPOSE 9001
