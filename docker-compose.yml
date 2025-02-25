@@ -13,7 +13,6 @@ services: # Начало секции с сервисами
     networks: # Настройка сетей
       - sp_network # Подключение к сети backend
 
-
   sp_server:
     build:
       context: ./
