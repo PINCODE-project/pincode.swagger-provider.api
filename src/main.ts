@@ -23,9 +23,9 @@ async function bootstrap() {
     const host: string = configService.getOrThrow<string>("APPLICATION_HOST");
     const globalPrefix: string = "/api";
 
-    app.use(helmet());
+    // app.use(helmet());
     // app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-    app.use(helmet({ crossOriginResourcePolicy: false }));
+    // app.use(helmet({ crossOriginResourcePolicy: false }));
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
     app.enableCors({
