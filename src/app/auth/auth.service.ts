@@ -1,48 +1,42 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+    UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthMethod, User } from "@prisma/__generated__";
 import { verify } from "argon2";
-import { JwtService } from "@nestjs/jwt";
+import { Request, Response } from "express";
 
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { EmailConfirmationService } from "./email-confirmation/email-confirmation.service";
 import { ProviderService } from "./provider/provider.service";
 import { TwoFactorAuthService } from "./two-factor-auth/two-factor-auth.service";
+
 import { UserService } from "@/user/user.service";
 import { PrismaService } from "@/prisma/prisma.service";
 
 @Injectable()
 export class AuthService {
-    constructor(
+    public constructor(
         private readonly prismaService: PrismaService,
         private readonly userService: UserService,
         private readonly configService: ConfigService,
         private readonly providerService: ProviderService,
         private readonly emailConfirmationService: EmailConfirmationService,
         private readonly twoFactorAuthService: TwoFactorAuthService,
-        private readonly jwtService: JwtService,
     ) {}
-
-    private generateToken(user: User) {
-        const payload = { sub: user.id, email: user.email };
-        return {
-            accessToken: this.jwtService.sign(payload, {
-                secret: this.configService.getOrThrow<string>("JWT_SECRET"),
-                expiresIn: "1h",
-            }),
-            refreshToken: this.jwtService.sign(payload, {
-                secret: this.configService.getOrThrow<string>("JWT_REFRESH_SECRET"),
-                expiresIn: "7d",
-            }),
-        };
-    }
 
     public async register(dto: RegisterDto) {
         const isExists = await this.userService.findByEmail(dto.email);
 
         if (isExists) {
-            throw new ConflictException("Пользователь с таким email уже существует.");
+            throw new ConflictException(
+                "Регистрация не удалась. Пользователь с таким email уже существует. Пожалуйста, используйте другой email или войдите в систему.",
+            );
         }
 
         const newUser = await this.userService.create(
@@ -56,43 +50,75 @@ export class AuthService {
 
         await this.emailConfirmationService.sendVerificationToken(newUser.email);
 
-        return { message: "Подтвердите ваш email." };
+        return {
+            message:
+                "Вы успешно зарегистрировались. Пожалуйста, подтвердите ваш email. Сообщение было отправлено на ваш почтовый адрес.",
+        };
     }
 
-    public async login(dto: LoginDto) {
+    public async login(req: Request, dto: LoginDto) {
         const user = await this.userService.findByEmail(dto.email);
+
         if (!user || !user.password) {
-            throw new NotFoundException("Пользователь не найден.");
+            throw new NotFoundException("Пользователь не найден. Пожалуйста, проверьте введенные данные");
         }
 
         const isValidPassword = await verify(user.password, dto.password);
+
         if (!isValidPassword) {
-            throw new UnauthorizedException("Неверный пароль.");
+            throw new UnauthorizedException(
+                "Неверный пароль. Пожалуйста, попробуйте еще раз или восстановите пароль, если забыли его.",
+            );
         }
 
         if (!user.isVerified) {
             await this.emailConfirmationService.sendVerificationToken(user.email);
-            throw new UnauthorizedException("Email не подтвержден.");
+            throw new UnauthorizedException(
+                "Ваш email не подтвержден. Пожалуйста, проверьте вашу почту и подтвердите адрес.",
+            );
         }
 
         if (user.isTwoFactorEnabled) {
             if (!dto.code) {
                 await this.twoFactorAuthService.sendTwoFactorToken(user.email);
-                return { message: "Введите код 2FA." };
+
+                return {
+                    message: "Проверьте вашу почту. Требуется код двухфакторной аутентификации.",
+                };
             }
+
             await this.twoFactorAuthService.validateTwoFactorToken(user.email, dto.code);
         }
 
-        return this.generateToken(user);
+        return this.saveSession(req, user);
     }
 
-    public async extractProfileFromCode(provider: string, code: string) {
+    public async extractProfileFromCode(req: Request, provider: string, code: string) {
         const providerInstance = this.providerService.findByService(provider);
         const profile = await providerInstance.findUserByCode(code);
 
-        let user = await this.prismaService.user.findFirst({ where: { email: profile.email } });
+        const account = await this.prismaService.account.findFirst({
+            where: {
+                id: profile.id,
+                provider: profile.provider,
+            },
+        });
 
-        if (!user) {
+        let user = account?.userId ? await this.userService.findById(account.userId) : null;
+
+        if (user) {
+            return this.saveSession(req, user);
+        }
+
+        console.log(user, account, profile);
+
+        const userByEmail = await this.prismaService.user.findFirst({
+            where: {
+                email: profile.email,
+            },
+        });
+
+        if (!userByEmail) {
             user = await this.userService.create(
                 profile.email,
                 "",
@@ -112,23 +138,57 @@ export class AuthService {
                     expiresAt: profile.expires_at,
                 },
             });
+        } else {
+            await this.prismaService.account.create({
+                data: {
+                    userId: userByEmail.id,
+                    type: "oauth",
+                    provider: profile.provider,
+                    accessToken: profile.access_token,
+                    refreshToken: profile.refresh_token,
+                    expiresAt: profile.expires_at,
+                },
+            });
+
+            return this.saveSession(req, userByEmail);
         }
 
-        return this.generateToken(user);
+        return this.saveSession(req, user);
     }
 
-    public async refreshToken(token: string) {
-        try {
-            const payload = this.jwtService.verify(token, {
-                secret: this.configService.getOrThrow<string>("JWT_REFRESH_SECRET"),
+    public async logout(req: Request, res: Response): Promise<void> {
+        return new Promise((resolve, reject) => {
+            req.session.destroy((err) => {
+                if (err) {
+                    return reject(
+                        new InternalServerErrorException(
+                            "Не удалось завершить сессию. Возможно, возникла проблема с сервером или сессия уже была завершена.",
+                        ),
+                    );
+                }
+                res.clearCookie(this.configService.getOrThrow<string>("SESSION_NAME"));
+                resolve();
             });
-            const user = await this.userService.findById(payload.sub);
-            if (!user) {
-                throw new UnauthorizedException("Пользователь не найден.");
-            }
-            return this.generateToken(user);
-        } catch {
-            throw new UnauthorizedException("Недействительный refresh token.");
-        }
+        });
+    }
+
+    public async saveSession(req: Request, user: User) {
+        return new Promise((resolve, reject) => {
+            req.session.userId = user.id;
+
+            req.session.save((err) => {
+                if (err) {
+                    return reject(
+                        new InternalServerErrorException(
+                            "Не удалось сохранить сессию. Проверьте, правильно ли настроены параметры сессии.",
+                        ),
+                    );
+                }
+
+                resolve({
+                    user,
+                });
+            });
+        });
     }
 }
