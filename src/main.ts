@@ -39,7 +39,7 @@ async function bootstrap() {
             resave: true,
             saveUninitialized: false,
             cookie: {
-                domain: "swagger-provider.com",
+                domain: "pincode-dev.ru",
                 // domain: configService.getOrThrow<string>("SESSION_DOMAIN"),
                 maxAge: ms(configService.getOrThrow<StringValue>("SESSION_MAX_AGE")),
                 httpOnly: parseBoolean(configService.getOrThrow<string>("SESSION_HTTP_ONLY")),
