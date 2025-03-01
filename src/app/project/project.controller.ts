@@ -8,6 +8,7 @@ import { UpdateProjectDto } from "./dto/update-project.dto";
 import { Authorization } from "@/auth/decorators/auth.decorator";
 import { FindAllProjectByWorkspaceDto } from "@/project/dto/find-all-project-by-workspace.dto";
 import { Request } from "express";
+import { Authorized } from "@/auth/decorators/authorized.decorator";
 
 @ApiTags("project")
 @Controller("project")
@@ -18,16 +19,16 @@ export class ProjectController {
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Post()
-    create(@Req() req: Request, @Body() createProjectDto: CreateProjectDto) {
-        return this.projectService.create(createProjectDto, req.session.userId);
+    create(@Authorized("id") userId: string, @Body() createProjectDto: CreateProjectDto) {
+        return this.projectService.create(createProjectDto, userId);
     }
 
     @ApiOperation({ summary: "Получение всех проектов в пространстве" })
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get("by-workspace/:workspaceId")
-    findAllBuWorkspace(@Req() req: Request, @Param() dto: FindAllProjectByWorkspaceDto) {
-        return this.projectService.findAllByWorkspace(dto, req.session.userId);
+    findAllBuWorkspace(@Authorized("id") userId: string, @Param() dto: FindAllProjectByWorkspaceDto) {
+        return this.projectService.findAllByWorkspace(dto, userId);
     }
     //
     // @Get(":id")

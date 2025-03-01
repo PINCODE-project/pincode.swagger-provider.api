@@ -4,6 +4,11 @@ import { UserRole } from "@prisma/__generated__";
 
 import { ROLES_KEY } from "../decorators/roles.decorator";
 
+/**
+ * Системный гвард для проверки ролей, не используется напрямую
+ *
+ * Для установки роли в авторизованный гвард используйте @Authorization(UserRole.ADMIN) декоратор
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
     public constructor(private readonly reflector: Reflector) {}

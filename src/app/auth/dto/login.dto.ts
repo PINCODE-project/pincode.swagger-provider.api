@@ -17,5 +17,5 @@ export class LoginDto {
     @ApiProperty()
     @IsOptional()
     @IsString()
-    code: string;
+    code?: string;
 }

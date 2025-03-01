@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Req } from "@nestjs/common";
 import { UserRole } from "@prisma/__generated__";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
@@ -17,6 +17,7 @@ export class UserController {
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get("profile")
+    // public async findProfile(@Req() req) {
     public async findProfile(@Authorized("id") userId: string) {
         return this.userService.findById(userId);
     }
