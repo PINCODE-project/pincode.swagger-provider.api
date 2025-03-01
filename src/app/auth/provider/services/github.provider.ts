@@ -18,7 +18,7 @@ export class GithubProvider extends BaseOAuthService {
     public async extractUserInfo(data: GithubProfile): Promise<TypeUserInfo> {
         console.log("GITHUB PROVIDER DATA", data);
         return super.extractUserInfo({
-            email: data.email,
+            email: data.email || data.notification_email,
             name: data.login,
             picture: data.avatar_url,
         });
@@ -30,7 +30,8 @@ interface GithubProfile {
     id: string;
     client_id: string;
     psuid: string;
-    email?: string[];
+    email?: string;
+    notification_email?: string;
     default_email?: string;
     is_avatar_empty?: boolean;
     default_avatar_id?: string;
