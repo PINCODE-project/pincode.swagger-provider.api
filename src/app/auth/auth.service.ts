@@ -87,6 +87,8 @@ export class AuthService {
                 },
             });
         }
+
+        console.log(profile, user, account);
         return this.generateToken(user, provider);
     }
 
