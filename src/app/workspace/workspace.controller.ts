@@ -8,6 +8,7 @@ import { AddMemberToWorkspaceDto } from "./dto/add-member-to-workspace.dto";
 
 import { Authorization } from "@/auth/decorators/auth.decorator";
 import { FindWorkspaceDto } from "@/workspace/dto/find-workspace.dto";
+import { Authorized } from "@/auth/decorators/authorized.decorator";
 
 @ApiTags("workspace")
 @Controller("workspace")
@@ -18,8 +19,8 @@ export class WorkspaceController {
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Post()
-    create(@Req() req: Request, @Body() dto: CreateWorkspaceDto) {
-        return this.workspaceService.create(dto, req.session.userId);
+    create(@Authorized("id") userId: string, @Body() dto: CreateWorkspaceDto) {
+        return this.workspaceService.create(dto, userId);
     }
 
     @ApiOperation({ summary: "Добавить пользователя в пространство" })
@@ -34,16 +35,16 @@ export class WorkspaceController {
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get()
-    findAll(@Req() req: Request) {
-        return this.workspaceService.findAll(req.session.userId);
+    findAll(@Authorized("id") userId: string) {
+        return this.workspaceService.findAll(userId);
     }
 
     @ApiOperation({ summary: "Получение пространства" })
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get(":id")
-    findOne(@Req() req: Request, @Param() dto: FindWorkspaceDto) {
-        return this.workspaceService.findOne(dto, req.session.userId);
+    findOne(@Authorized("id") userId: string, @Param() dto: FindWorkspaceDto) {
+        return this.workspaceService.findOne(dto, userId);
     }
     //
     // @Patch(":id")

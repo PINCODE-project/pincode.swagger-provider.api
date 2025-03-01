@@ -16,7 +16,6 @@ export class GithubProvider extends BaseOAuthService {
     }
 
     public async extractUserInfo(data: GithubProfile): Promise<TypeUserInfo> {
-        console.log(data);
         return super.extractUserInfo({
             email: data.email,
             name: data.login,

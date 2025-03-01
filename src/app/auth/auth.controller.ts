@@ -8,13 +8,12 @@ import {
     Param,
     Post,
     Query,
-    Req,
     Res,
     UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Request, Response } from "express";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
@@ -41,15 +40,14 @@ export class AuthController {
     @ApiOperation({ summary: "Авторизация пользователя" })
     @Post("login")
     @HttpCode(HttpStatus.OK)
-    public async login(@Req() req: Request, @Body() dto: LoginDto) {
-        return this.authService.login(req, dto);
+    public async login(@Body() dto: LoginDto) {
+        return this.authService.login(dto);
     }
 
     @ApiOperation({ summary: "Авторизация через Oauth" })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/callback/:provider")
     public async callback(
-        @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
         @Query("code") code: string,
         @Param("provider") provider: string,
@@ -58,12 +56,11 @@ export class AuthController {
             throw new BadRequestException("Не был предоставлен код авторизации.");
         }
 
-        console.log(code, req, provider);
+        const token = await this.authService.extractProfileFromCode(provider, code);
 
-        await this.authService.extractProfileFromCode(req, provider, code);
-
-        console.log(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/dashboard`);
-        return res.redirect(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/dashboard`);
+        return res.redirect(
+            `${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback?token=accessToken=${token.accessToken}`,
+        );
     }
 
     @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
@@ -75,12 +72,5 @@ export class AuthController {
         return {
             url: providerInstance.getAuthUrl(),
         };
-    }
-
-    @ApiOperation({ summary: "Выход из аккаунта" })
-    @Post("logout")
-    @HttpCode(HttpStatus.OK)
-    public async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-        return this.authService.logout(req, res);
     }
 }

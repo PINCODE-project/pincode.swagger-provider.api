@@ -7,6 +7,7 @@ import { CreateMicroserviceDto } from "./dto/create-microservice.dto";
 import { Authorization } from "@/auth/decorators/auth.decorator";
 import { GetMicroserviceDto } from "@/microservice/dto/get-microservice.dto";
 import { Request } from "express";
+import { Authorized } from "@/auth/decorators/authorized.decorator";
 
 @ApiTags("microservice")
 @Controller("microservice")
@@ -21,30 +22,11 @@ export class MicroserviceController {
         return this.microserviceService.create(dto);
     }
 
-    // @Get()
-    // findAll() {
-    //     return this.microserviceService.findAll();
-    // }
-    //
-
     @ApiOperation({ summary: "Получение схемы" })
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get(":id")
-    findOne(@Req() req: Request, @Param() dto: GetMicroserviceDto) {
-        return this.microserviceService.findOne(dto, req.session.userId);
+    findOne(@Authorized("id") userId: string, @Param() dto: GetMicroserviceDto) {
+        return this.microserviceService.findOne(dto, userId);
     }
-
-    //
-    // @Patch(":id")
-    // update(
-    //     @Param("id") id: string,
-    //     @Body() updateMicroserviceDto: UpdateMicroserviceDto,
-    // ) {
-    //     return this.microserviceService.update(+id, updateMicroserviceDto);
-    // }
-    //
-    // @Delete(":id")
-    // remove(@Param("id") id: string) {
-    //     return this.microserviceService.remove(+id);
 }

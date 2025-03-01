@@ -1,15 +1,14 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { EmailConfirmationModule } from "./email-confirmation/email-confirmation.module";
 import { ProviderModule } from "./provider/provider.module";
-import { TwoFactorAuthService } from "./two-factor-auth/two-factor-auth.service";
-
 import { UserService } from "@/user/user.service";
-import { MailService } from "@/libs/mail/mail.service";
 import { getProvidersConfig } from "@/config/providers.config";
+import { JwtModule } from "@nestjs/jwt";
+import { JwtStrategy } from "@/auth/strategies/jwt.strategy";
+import { PassportModule } from "@nestjs/passport";
 
 @Module({
     imports: [
@@ -18,10 +17,20 @@ import { getProvidersConfig } from "@/config/providers.config";
             useFactory: getProvidersConfig,
             inject: [ConfigService],
         }),
-        forwardRef(() => EmailConfirmationModule),
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.get("JWT_SECRET"),
+                signOptions: {
+                    expiresIn: "30d",
+                },
+            }),
+            inject: [ConfigService],
+        }),
+        PassportModule,
     ],
     controllers: [AuthController],
-    providers: [AuthService, UserService, MailService, TwoFactorAuthService],
+    providers: [AuthService, UserService, JwtStrategy],
     exports: [AuthService],
 })
 export class AuthModule {}
