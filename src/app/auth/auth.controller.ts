@@ -59,7 +59,7 @@ export class AuthController {
         const token = await this.authService.extractProfileFromCode(provider, code);
 
         return res.redirect(
-            `${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback?token=accessToken=${token.accessToken}`,
+            `${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback?accessToken=${token.accessToken}`,
         );
     }
 
