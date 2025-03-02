@@ -18,14 +18,14 @@ export class GithubProvider extends BaseOAuthService {
     public async extractUserInfo(data: GithubProfile): Promise<TypeUserInfo> {
         console.log("GITHUB PROVIDER DATA", data);
         let private_email = "";
-        let emails = await fetch("https://api.github.com/user/emails", {
+        let emailsReq = await fetch("https://api.github.com/user/emails", {
             headers: {
                 Authorization: `Bearer ${data.access_token}`,
             },
         });
-        emails = await emails.json();
+        const emails: { email: string; primary: boolean }[] = await emailsReq.json();
         if (emails && Array.isArray(emails)) {
-            private_email = emails.sort((a, b) => b.verified - a.verified)[0];
+            private_email = emails.sort((a, b) => Number(b.primary) - Number(a.primary))[0]?.email;
         }
         console.log(emails, private_email);
 
