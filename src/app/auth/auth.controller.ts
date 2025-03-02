@@ -13,14 +13,14 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
-import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
+import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { AuthProviderGuard } from "./guards/provider.guard";
 import { ProviderService } from "./provider/provider.service";
-import { ConnectToProviderDto } from "@/auth/dto/connect-to-provider.dto";
+import { ConnectToProviderDto, ConnectToProviderResponseDto } from "@/auth/dto/connect-to-provider.dto";
 import { CallbackProviderParamDto, CallbackProviderQueryDto } from "@/auth/dto/callback-provider.dto";
 
 @ApiTags("auth")
@@ -42,6 +42,7 @@ export class AuthController {
     @ApiOperation({ summary: "Авторизация пользователя" })
     @Post("login")
     @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({ description: "Успешная авторизации!", type: LoginResponseDto })
     public async login(@Body() dto: LoginDto) {
         return this.authService.login(dto);
     }
@@ -72,6 +73,7 @@ export class AuthController {
     @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/connect/:provider")
+    @ApiOkResponse({ type: ConnectToProviderResponseDto })
     public async connect(@Param() dto: ConnectToProviderDto) {
         const providerInstance = this.providerService.findByService(dto.provider);
 

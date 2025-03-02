@@ -19,3 +19,8 @@ export class LoginDto {
     @IsString()
     code?: string;
 }
+
+export class LoginResponseDto {
+    @ApiProperty({ description: "Токен авторизации" })
+    accessToken: string;
+}
