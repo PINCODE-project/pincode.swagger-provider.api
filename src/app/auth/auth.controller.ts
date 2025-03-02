@@ -13,13 +13,15 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { AuthProviderGuard } from "./guards/provider.guard";
 import { ProviderService } from "./provider/provider.service";
+import { ConnectToProviderDto } from "@/auth/dto/connect-to-provider.dto";
+import { CallbackProviderParamDto, CallbackProviderQueryDto } from "@/auth/dto/callback-provider.dto";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -44,19 +46,23 @@ export class AuthController {
         return this.authService.login(dto);
     }
 
-    @ApiOperation({ summary: "Авторизация через Oauth" })
+    @ApiOperation({
+        summary: "Авторизация через Oauth",
+        description: `Используется провайдерами\n
+Перенаправляет на фронт по адресу вместе с токеном /auth/callback?accessToken=ТОКЕН`,
+    })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/callback/:provider")
     public async callback(
         @Res({ passthrough: true }) res: Response,
-        @Query("code") code: string,
-        @Param("provider") provider: string,
+        @Query() queryDto: CallbackProviderQueryDto,
+        @Param() paramDto: CallbackProviderParamDto,
     ) {
-        if (!code) {
+        if (!queryDto.code) {
             throw new BadRequestException("Не был предоставлен код авторизации.");
         }
 
-        const token = await this.authService.extractProfileFromCode(provider, code);
+        const token = await this.authService.extractProfileFromCode(paramDto.provider, queryDto.code);
 
         return res.redirect(
             `${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback?accessToken=${token.accessToken}`,
@@ -66,8 +72,8 @@ export class AuthController {
     @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/connect/:provider")
-    public async connect(@Param("provider") provider: string) {
-        const providerInstance = this.providerService.findByService(provider);
+    public async connect(@Param() dto: ConnectToProviderDto) {
+        const providerInstance = this.providerService.findByService(dto.provider);
 
         return {
             url: providerInstance.getAuthUrl(),
