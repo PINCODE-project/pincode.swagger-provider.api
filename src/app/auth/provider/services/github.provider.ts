@@ -17,6 +17,14 @@ export class GithubProvider extends BaseOAuthService {
 
     public async extractUserInfo(data: GithubProfile): Promise<TypeUserInfo> {
         console.log("GITHUB PROVIDER DATA", data);
+        let emails = await fetch("https://api.github.com/user/emails", {
+            headers: {
+                Authorization: `Bearer ${data.access_token}`,
+            },
+        });
+        emails = await emails.json();
+        console.log(emails);
+
         return super.extractUserInfo({
             email: data.email || data.notification_email,
             name: data.login,
