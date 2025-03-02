@@ -16,7 +16,6 @@ export class GithubProvider extends BaseOAuthService {
     }
 
     public async extractUserInfo(data: GithubProfile): Promise<TypeUserInfo> {
-        console.log("GITHUB PROVIDER DATA", data);
         let private_email = "";
         let emailsReq = await fetch("https://api.github.com/user/emails", {
             headers: {
@@ -27,7 +26,6 @@ export class GithubProvider extends BaseOAuthService {
         if (emails && Array.isArray(emails)) {
             private_email = emails.sort((a, b) => Number(b.primary) - Number(a.primary))[0]?.email;
         }
-        console.log(emails, private_email);
 
         return super.extractUserInfo({
             email: (Array.isArray(data.email) ? data.email[0] : data.email) || data.notification_email || private_email,
