@@ -22,7 +22,7 @@ export const getProvidersConfig = async (configService: ConfigService): Promise<
         new GithubProvider({
             client_id: configService.getOrThrow<string>("GITHUB_CLIENT_ID"),
             client_secret: configService.getOrThrow<string>("GITHUB_CLIENT_SECRET"),
-            scopes: ["repo", "user"],
+            scopes: ["read:user", "user:email"],
         }),
     ],
 });
