@@ -27,6 +27,7 @@ model User {
 
   accounts   Account[]
   workspaces WorkspaceMember[]
+  snippets   Snippet[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -149,6 +150,21 @@ model Server {
   microserviceId String?       @map("microservice_id")
 
   @@map("servers")
+}
+
+model Snippet {
+  id String @id @default(uuid())
+
+  name    String
+  snippet Json
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @map("user_id")
+
+  @@map("snippets")
 }
 
 enum UserRole {

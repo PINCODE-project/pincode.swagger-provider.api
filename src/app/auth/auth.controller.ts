@@ -13,7 +13,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
-import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
@@ -22,6 +22,8 @@ import { AuthProviderGuard } from "./guards/provider.guard";
 import { ProviderService } from "./provider/provider.service";
 import { ConnectToProviderDto, ConnectToProviderResponseDto } from "@/auth/dto/connect-to-provider.dto";
 import { CallbackProviderParamDto, CallbackProviderQueryDto } from "@/auth/dto/callback-provider.dto";
+import { getBadRequestErrors } from "@/libs/common/utils/get-errors";
+import { ApiBaseResponse } from "@/libs/common/utils/base-response";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -40,9 +42,35 @@ export class AuthController {
     }
 
     @ApiOperation({ summary: "Авторизация пользователя" })
-    @Post("login")
+    @ApiBaseResponse(LoginResponseDto, "Пользователь успешно авторизовался")
+    @ApiResponse(
+        getBadRequestErrors("Неверные данные", [
+            { error: "Пользователь не найден.", description: "Пользователь не найден" },
+        ]),
+    )
+    @ApiUnauthorizedResponse({
+        status: 400,
+        description: "Пользователь существует, но введён неверный пароль",
+        content: {
+            "application/json": {
+                examples: {
+                    "Неверный пароль": {
+                        value: {
+                            meta: {
+                                timestamp: "2025-03-03T15:50:57.083Z",
+                                statusCode: 401,
+                            },
+                            data: {
+                                message: "Неверный пароль.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    })
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ description: "Успешная авторизации!", type: LoginResponseDto })
+    @Post("login")
     public async login(@Body() dto: LoginDto) {
         return this.authService.login(dto);
     }

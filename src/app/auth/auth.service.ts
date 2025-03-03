@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AuthMethod, User } from "@prisma/__generated__";
 import { verify } from "argon2";
@@ -45,7 +51,7 @@ export class AuthService {
         const user = await this.userService.findByEmail(dto.email);
 
         if (!user || !user.password) {
-            throw new NotFoundException("Пользователь не найден.");
+            throw new BadRequestException("Пользователь не найден.");
         }
 
         const isValidPassword = await verify(user.password, dto.password);
@@ -88,7 +94,6 @@ export class AuthService {
             });
         }
 
-        console.log(profile, user, account);
         return this.generateToken(user, provider);
     }
 

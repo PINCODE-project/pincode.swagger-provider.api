@@ -41,7 +41,7 @@ export const setupSwagger = (app: INestApplication) => {
         },
     };
 
-    const swaggerUI = new SwaggerUI(configService.get<string>("app.url"));
+    const swaggerUI = new SwaggerUI(configService.get<string>("APPLICATION_URL"));
 
     SwaggerModule.setup(docPrefix, app, document, {
         jsonDocumentUrl: `${docPrefix}-json`,

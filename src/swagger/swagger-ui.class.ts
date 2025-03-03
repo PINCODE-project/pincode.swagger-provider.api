@@ -1,8 +1,9 @@
 export class SwaggerUI {
     private customSiteTitle = "Swagger Provider Documentation";
-    private faviconFilename = "Logo.svg";
+    private faviconFilename = "favicon.ico";
     private topbarIconFilename = "Logo.svg";
-    private customfavIcon: string = `${this.applicationUrl}/static/swagger/assets/${this.faviconFilename}`;
+
+    private customfavIcon: string = `${this.applicationUrl}/api/static/swagger/${this.faviconFilename}`;
     private customCss: string = `
         html { height: 100%; }
         body { height: 100%; background: #242428;}
@@ -25,9 +26,15 @@ export class SwaggerUI {
             background-color: #202023;
         }
         
+        .topbar {
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        
         .topbar-wrapper {
-            content: url('${this.applicationUrl}/static/swagger/${this.topbarIconFilename}');
-            width: 200px;
+            content: url('${this.applicationUrl}/api/static/swagger/${this.topbarIconFilename}');
+            width: 150px;
             height: auto;
         }
         
@@ -338,5 +345,7 @@ export class SwaggerUI {
         swaggerOptions: this.swaggerOptions,
     };
 
-    constructor(private readonly applicationUrl: string) {}
+    constructor(private readonly applicationUrl: string) {
+        console.log(this.customfavIcon);
+    }
 }

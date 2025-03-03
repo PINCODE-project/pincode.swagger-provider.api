@@ -21,6 +21,10 @@ export class LoginDto {
 }
 
 export class LoginResponseDto {
-    @ApiProperty({ description: "Токен авторизации" })
+    @ApiProperty({
+        description: "Токен авторизации",
+        example:
+            "eyJhbGciOiJIUzI2NiIsInR5cCI2IkpXVCJ9.eyJpZCI6IjZmZTAwNzkwLTA5ZGUtNDZiNC1hYmVjLWRjOTUyNTQ5N2RlYiIsImVtYWlsIjoici6tYXhpbWthQG1haWwucnUiLCJwcm82aWRlciI6IiIsImlhdCI6MTc0MTAyNjE5MywiZXhwIjoxNzQzNjE4MTkzfQ.zvjUbE_H0GZr8yoD7uIlNNnbadgSfWfjEocEbLYUe6Q",
+    })
     accessToken: string;
 }
