@@ -5,6 +5,8 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 COPY prisma ./prisma
 
+RUN apk add --no-cache openssl
+
 RUN yarn install --frozen-lockfile
 
 COPY . .
@@ -20,6 +22,8 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/yarn.lock /app/
 COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/prisma /app/prisma
+
+RUN apk add --no-cache openssl
 
 RUN yarn install --production --frozen-lockfile
 
