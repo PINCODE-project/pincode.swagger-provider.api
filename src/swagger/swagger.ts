@@ -47,6 +47,7 @@ export const setupSwagger = (app: INestApplication) => {
         jsonDocumentUrl: `${docPrefix}-json`,
         explorer: true,
         customSiteTitle: docName,
+        customSwaggerUiPath: "./node_modules/swagger-ui-dist",
         ...customOptions,
         ...swaggerUI.customOptions,
     });
