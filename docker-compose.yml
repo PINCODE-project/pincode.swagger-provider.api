@@ -11,7 +11,7 @@ services: # Начало секции с сервисами
       - "9178:9001"
     networks:
       - sp_network
-      -
+        
 networks:
   sp_network:
     driver: bridge
