@@ -36,10 +36,10 @@ import { HttpExceptionFilter } from "@/filters/http.exception.filter";
             ignoreEnvFile: !IS_DEV_ENV,
             isGlobal: true,
         }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, "..", "..", "static"),
-            serveRoot: "/api/static",
-        }),
+        // ServeStaticModule.forRoot({
+        //     rootPath: join(__dirname, "..", "..", "static"),
+        //     serveRoot: "/api/static",
+        // }),
         PrismaModule,
         AuthModule,
         UserModule,
