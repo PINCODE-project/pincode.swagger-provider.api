@@ -25,7 +25,10 @@ export const setupSwagger = (app: INestApplication) => {
         documentBuild.addTag(tag.name, tag.description);
     });
 
-    const documentBuilt = documentBuild.build();
+    const documentBuilt = documentBuild
+        .addServer("https://pincode-dev.ru/swagger")
+        .addServer("http://localhost:9001")
+        .build();
 
     const document = SwaggerModule.createDocument(app, documentBuilt, {
         deepScanRoutes: true,
