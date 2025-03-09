@@ -18,6 +18,7 @@ import { TerminusModule } from "@nestjs/terminus";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { HttpExceptionFilter } from "@/filters/http.exception.filter";
+import { OpenapiSchemeModule } from './openapi-scheme/openapi-scheme.module';
 
 @Module({
     controllers: [AppController],
@@ -49,6 +50,7 @@ import { HttpExceptionFilter } from "@/filters/http.exception.filter";
         MicroserviceModule,
         SnippetModule,
         TerminusModule,
+        OpenapiSchemeModule,
     ],
 })
 export class AppModule implements NestModule {

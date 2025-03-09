@@ -5,12 +5,16 @@ import { CreateMicroserviceDto } from "./dto/create-microservice.dto";
 import { PrismaService } from "@/prisma/prisma.service";
 import { isExistById } from "@/libs/common/utils/check-exist";
 import { GetMicroserviceDto } from "@/microservice/dto/get-microservice.dto";
-import { MicroserviceType } from "@prisma/__generated__";
+import { MicroserviceType, OpenApiSchemeUpdateType } from "@prisma/__generated__";
 import axios from "axios";
+import { OpenapiSchemeService } from "@/openapi-scheme/openapi-scheme.service";
 
 @Injectable()
 export class MicroserviceService {
-    public constructor(private readonly prismaService: PrismaService) {}
+    public constructor(
+        private readonly prismaService: PrismaService,
+        private readonly openapiSchemeService: OpenapiSchemeService,
+    ) {}
 
     async create(dto: CreateMicroserviceDto) {
         if (!(await isExistById(this.prismaService.project, dto.projectId))) {
@@ -21,12 +25,21 @@ export class MicroserviceService {
             data: {
                 name: dto.name,
                 type: dto.type,
-                content: dto.content ?? "",
                 projectId: dto.projectId ?? null,
+                isUpdateByGetScheme: dto.isUpdateByGetScheme,
             },
         });
 
-        return microservice;
+        const scheme = await this.prismaService.openApiScheme.create({
+            data: {
+                updateType: OpenApiSchemeUpdateType.INIT,
+                content: dto.content ?? "",
+                version: 0,
+                microserviceId: microservice.id,
+            },
+        });
+
+        return { ...microservice, content: scheme.content };
     }
 
     // findAll() {
@@ -42,8 +55,15 @@ export class MicroserviceService {
             include: {
                 project: true,
                 servers: true,
+                schemes: {
+                    orderBy: {
+                        version: "desc",
+                    },
+                    take: 1,
+                },
             },
         });
+        const openapiScheme = microservice["schemes"][0];
 
         if (!microservice) {
             throw new BadRequestException("Микросервис не найден");
@@ -70,15 +90,16 @@ export class MicroserviceService {
         result["id"] = microservice.id;
         result["name"] = microservice.name;
         result["type"] = microservice.type;
-        result["url"] = microservice.content;
+        result["url"] = openapiScheme.content;
         result["createdAt"] = microservice.createdAt;
         result["updatedAt"] = microservice.updatedAt;
         result["projectId"] = microservice.projectId;
         result["servers"] = microservice.servers;
+        result["version"] = openapiScheme.version;
 
         if (microservice.type === MicroserviceType.URL) {
             try {
-                const response = await axios(microservice.content, {
+                const response = await axios(openapiScheme.content, {
                     auth: {
                         username: "Admin",
                         password: "P@ssw0rd",
@@ -90,23 +111,29 @@ export class MicroserviceService {
                 const scheme = JSON.stringify(response.data);
 
                 result["status"] = "ONLINE";
-                result["content"] = scheme;
+                result["content"] = microservice.isUpdateByGetScheme ? scheme : openapiScheme.cache;
 
-                await this.prismaService.microservice.update({
-                    where: { id: microservice.id },
-                    data: {
-                        cache: scheme,
-                    },
-                });
+                if (microservice.isUpdateByGetScheme && openapiScheme.cache !== scheme) {
+                    const newVersion = await this.prismaService.openApiScheme.create({
+                        data: {
+                            updateType: OpenApiSchemeUpdateType.GET_REQUEST,
+                            content: openapiScheme.content ?? "",
+                            cache: scheme,
+                            version: openapiScheme.version + 1,
+                            microserviceId: microservice.id,
+                        },
+                    });
+                    result["version"] = newVersion.version;
+                }
             } catch (error) {
                 result["status"] = "OFFLINE";
-                if (microservice.cache) result["content"] = microservice.cache;
+                if (openapiScheme.cache) result["content"] = openapiScheme.cache;
                 else result["content"] = error.message;
             }
         } else if (microservice.type === MicroserviceType.TEXT) {
             let content = null;
             try {
-                content = JSON.parse(microservice.content);
+                content = JSON.parse(openapiScheme.content);
                 content.servers = [...content.servers, servers];
             } catch (error) {
                 content = error.message;

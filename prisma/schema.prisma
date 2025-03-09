@@ -121,10 +121,10 @@ model Project {
 model Microservice {
   id String @id @default(uuid())
 
-  name    String
-  type    MicroserviceType
-  content String?
-  cache   String?
+  name String
+  type MicroserviceType
+
+  isUpdateByGetScheme Boolean @default(true) @map("is_update_by_get_scheme")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -133,8 +133,26 @@ model Microservice {
   projectId String?  @map("project_id")
 
   servers Server[]
+  schemes OpenApiScheme[]
 
   @@map("microservices")
+}
+
+model OpenApiScheme {
+  id String @id @default(uuid())
+
+  version    Int
+  content    String?
+  cache      String?
+  updateType OpenApiSchemeUpdateType
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  microservice   Microservice? @relation(fields: [microserviceId], references: [id], onDelete: Cascade)
+  microserviceId String?       @map("microservice_id")
+
+  @@map("openapi_schemes")
 }
 
 model Server {
@@ -195,4 +213,12 @@ enum TokenType {
   VERIFICATION
   TWO_FACTOR
   PASSWORD_RESET
+}
+
+enum OpenApiSchemeUpdateType {
+  INIT
+  WEBHOOK
+  GET_REQUEST
+  MANUAL
+  CLI
 }

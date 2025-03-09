@@ -1,5 +1,5 @@
 import { MicroserviceType } from "@prisma/__generated__";
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateMicroserviceDto {
@@ -19,4 +19,8 @@ export class CreateMicroserviceDto {
     @ApiProperty({ type: "string", format: "uuid" })
     @IsUUID()
     projectId?: string;
+
+    @ApiProperty({ description: "Должна ли обновляться схема при её получении" })
+    @IsBoolean({ message: "IsUpdateByGetScheme должен быть строкой" })
+    isUpdateByGetScheme: boolean;
 }
