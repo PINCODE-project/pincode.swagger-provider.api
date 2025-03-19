@@ -1,6 +1,6 @@
-version: '3.7' # Указывает версию Docker Compose
+version: '3.7'
 
-services: # Начало секции с сервисами
+services:
   sp_server:
     build:
       context: ./
@@ -8,7 +8,7 @@ services: # Начало секции с сервисами
     restart: always
     env_file: ".env"
     ports:
-      - "9178:9001"
+      - "9001:9001"
     networks:
       - sp_network
         
