@@ -14,9 +14,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_CATDEV }}
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY_CATDEV }}" > private_key && chmod 600 private_key
+        eval $(ssh-agent -s)
+        echo "${{ secrets.SSH_PASSPHRASE }}" | SSH_ASKPASS=/bin/cat ssh-add private_key
 
     - name: Deploy to Server
       run: |
