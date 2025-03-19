@@ -21,7 +21,7 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
+        ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
           cd pincode.swagger-provider.api &&
           git pull &&
           sudo docker compose up -d --build
