@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   sp_server:
+    container_name: backend-swagger
     build:
       context: ./
       dockerfile: Dockerfile
