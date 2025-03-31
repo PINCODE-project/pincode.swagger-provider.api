@@ -16,17 +16,11 @@ async function bootstrap() {
     const host: string = configService.getOrThrow<string>("APPLICATION_HOST");
     const globalPrefix: string = "/api";
 
-    // app.use(helmet());
-    // app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
-    // app.use(helmet({ crossOriginResourcePolicy: false }));
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
-    // app.enableCors({
-    //     origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
-    //     credentials: true,
-    // });
     app.enableCors({
-        //     origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
         credentials: true,
     });
 
