@@ -26,7 +26,7 @@ export const setupSwagger = (app: INestApplication) => {
     });
 
     const documentBuilt = documentBuild
-        .addServer("https://pincode-dev.ru/swagger")
+        .addServer("https://backend-swagger.pincode-dev.ru/")
         .addServer("http://localhost:9001")
         .build();
 
