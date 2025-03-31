@@ -25,7 +25,10 @@ async function bootstrap() {
     //     origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
     //     credentials: true,
     // });
-    app.enableCors();
+    app.enableCors({
+        //     origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
+        credentials: true,
+    });
 
     setupSwagger(app);
     await app.listen(port, host);
