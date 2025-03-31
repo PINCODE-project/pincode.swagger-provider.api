@@ -22,7 +22,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
     app.enableCors({
-        origin: ["http://localhost:5001", "https://swagger-provider.com"],
+        origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-dev.ru/"],
         credentials: true,
     });
 
