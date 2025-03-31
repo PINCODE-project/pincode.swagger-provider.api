@@ -20,7 +20,7 @@ async function bootstrap() {
     app.setGlobalPrefix(globalPrefix);
     app.enableCors({
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        origin: ["http://localhost:5001", "https://swagger-provider.com", "https://backend-swagger.pincode-infra.ru/"],
+        origin: ["http://localhost:5001", "https://swagger-provider.com", /\.pincode-infra\.ru$/],
         credentials: true,
         preflightContinue: true,
         allowedHeaders: ['Content-Type', 'Authorization']
