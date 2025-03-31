@@ -9,6 +9,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const context = host.switchToHttp();
         const response = context.getResponse<Response>();
 
+        if (response.headersSent) {
+            this.logger.error("Headers already sent. Cannot send error response.");
+            return;
+        }
+
         const statusCode =
             exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
