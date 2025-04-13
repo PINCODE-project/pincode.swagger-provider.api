@@ -1,14 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 import { ProjectService } from "./project.service";
-import { CreateProjectDto } from "./dto/create-project.dto";
-import { UpdateProjectDto } from "./dto/update-project.dto";
+import { CreateProjectDto, CreateProjectResponseDto } from "./dto/create-project.dto";
 
 import { Authorization } from "@/auth/decorators/auth.decorator";
-import { FindAllProjectByWorkspaceDto } from "@/project/dto/find-all-project-by-workspace.dto";
-import { Request } from "express";
+import {
+    FindAllProjectByWorkspaceDto,
+    FindAllProjectByWorkspaceResponseDto,
+} from "@/project/dto/find-all-project-by-workspace.dto";
 import { Authorized } from "@/auth/decorators/authorized.decorator";
+import { ApiBaseResponse } from "@/libs/common/utils/base-response";
 
 @ApiTags("project")
 @Controller("project")
@@ -16,6 +18,7 @@ export class ProjectController {
     constructor(private readonly projectService: ProjectService) {}
 
     @ApiOperation({ summary: "Создание проекта" })
+    @ApiBaseResponse(CreateProjectResponseDto, "Созданный проект")
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Post()
@@ -24,28 +27,11 @@ export class ProjectController {
     }
 
     @ApiOperation({ summary: "Получение всех проектов в пространстве" })
+    @ApiBaseResponse(FindAllProjectByWorkspaceResponseDto, "Список проектов")
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get("by-workspace/:workspaceId")
     findAllBuWorkspace(@Authorized("id") userId: string, @Param() dto: FindAllProjectByWorkspaceDto) {
         return this.projectService.findAllByWorkspace(dto, userId);
     }
-    //
-    // @Get(":id")
-    // findOne(@Param("id") id: string) {
-    //     return this.projectService.findOne(+id);
-    // }
-    //
-    // @Patch(":id")
-    // update(
-    //     @Param("id") id: string,
-    //     @Body() updateProjectDto: UpdateProjectDto,
-    // ) {
-    //     return this.projectService.update(+id, updateProjectDto);
-    // }
-    //
-    // @Delete(":id")
-    // remove(@Param("id") id: string) {
-    //     return this.projectService.remove(+id);
-    // }
 }

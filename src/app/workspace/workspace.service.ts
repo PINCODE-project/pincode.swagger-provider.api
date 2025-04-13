@@ -28,7 +28,7 @@ export class WorkspaceService {
             role: WorkspaceMemberRole.SUPERADMIN,
         });
 
-        return workspace;
+        return { workspace };
     }
 
     async addMemberToWorkspace(dto: AddMemberToWorkspaceDto) {
@@ -81,7 +81,7 @@ export class WorkspaceService {
             },
         });
 
-        return workspaces;
+        return { workspaces };
     }
 
     async findOne(dto: FindWorkspaceDto, userId: string) {
@@ -114,14 +114,6 @@ export class WorkspaceService {
             throw new BadRequestException("Пользователь не состоит в пространстве");
         }
 
-        return workspace;
-    }
-
-    update(id: number, updateWorkspaceDto: UpdateWorkspaceDto) {
-        return `This action updates a #${id} workspace`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} workspace`;
+        return { workspace };
     }
 }

@@ -21,3 +21,33 @@ export class CreateProjectDto {
     @IsUUID()
     workspaceId: string;
 }
+
+export class CreateProjectResponseProjectDto {
+    @ApiProperty({ type: "string", format: "uuid" })
+    id: string;
+
+    @ApiProperty()
+    name: string;
+
+    @ApiProperty()
+    emoji?: string;
+
+    @ApiProperty()
+    description?: string;
+
+    @ApiProperty({ type: "string", format: "date-time" })
+    createdAt: Date
+
+    @ApiProperty({ type: "string", format: "date-time" })
+    updatedAt: Date
+
+    @ApiProperty({ type: "string", format: "uuid" })
+    @IsUUID()
+    workspaceId: string;
+}
+
+
+export class CreateProjectResponseDto {
+    @ApiProperty({ type: () => CreateProjectResponseProjectDto })
+    project: CreateProjectResponseProjectDto;
+}

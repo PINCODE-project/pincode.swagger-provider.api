@@ -36,7 +36,7 @@ export class ProjectService {
             },
         });
 
-        return project;
+        return { project };
     }
 
     async findAllByWorkspace(dto: FindAllProjectByWorkspaceDto, userId: string) {
@@ -66,18 +66,6 @@ export class ProjectService {
             },
         });
 
-        return projects;
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} project`;
-    }
-
-    update(id: number, updateProjectDto: UpdateProjectDto) {
-        return `This action updates a #${id} project`;
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} project`;
+        return { projects };
     }
 }

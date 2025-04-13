@@ -17,3 +17,28 @@ export class CreateWorkspaceDto {
     @IsOptional()
     description?: string;
 }
+
+export class CreateWorkspaceResponseWorkspaceDto {
+    @ApiProperty({ type: "string", format: "uuid" })
+    id: string;
+
+    @ApiProperty()
+    name: string;
+
+    @ApiProperty()
+    emoji: string;
+
+    @ApiProperty()
+    description: string;
+
+    @ApiProperty({ type: "string", format: "date-time" })
+    createdAt: Date;
+
+    @ApiProperty({ type: "string", format: "date-time" })
+    updatedAt: Date;
+}
+
+export class CreateWorkspaceResponseDto {
+    @ApiProperty({ type: () => CreateWorkspaceResponseWorkspaceDto })
+    workspace: CreateWorkspaceResponseWorkspaceDto;
+}
