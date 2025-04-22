@@ -43,5 +43,8 @@ jobs:
       - name: Run API Tests
         run: |
           ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
-            bash -l -c "cd pincode.swagger-provider.api && npx yarn install && npx yarn test:api"
+            cd pincode.swagger-provider.api &&
+            source ~/.nvm/nvm.sh &&
+            yarn install &&
+            yarn test:api
           '
