@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  test:
+  deploy_and_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,21 +16,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: 20
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run API tests
-        run: yarn test:api
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        run: npm ci
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -47,3 +36,14 @@ jobs:
             sudo docker compose up -d --build &&
             sudo docker system prune -af
           '
+
+      - name: Wait for server to be ready
+        uses: jakejarvis/wait-action@master
+        with:
+          url: https://${{ secrets.BACKEND_URL }}
+          timeout: 60
+
+      - name: Run API tests against server
+        env:
+          BASE_URL: https://${{ secrets.BACKEND_URL }}
+        run: npm run test:api
