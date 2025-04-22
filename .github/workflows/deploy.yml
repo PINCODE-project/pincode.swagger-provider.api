@@ -28,7 +28,6 @@ jobs:
             sudo docker compose up -d --build &&
             sudo docker system prune -af
           '
-
   test:
     runs-on: ubuntu-latest
     needs: deploy
@@ -36,26 +35,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_CATDEV }}
-
-      - name: Wait for container to be ready
+      - name: Install dependencies
         run: |
-          ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
-            until sudo docker ps | grep -q "backend-swagger"; do
-              echo "Waiting for container to start...";
-              sleep 5;
-            done;
-            echo "Container is running, starting tests..."
-          '
+          yarn install
 
-      - name: Run tests
+      - name: Run API tests
         run: |
-          ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
-            source ~/.bashrc &&
-            cd pincode.swagger-provider.api &&
-            yarn install &&
-            yarn test:api
-          '
+          yarn test:api
