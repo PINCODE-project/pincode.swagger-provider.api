@@ -1,6 +1,6 @@
 {
-  "name": "p-1.sso",
-  "version": "2.0.0",
+  "name": "pincode.swagger-provider.api",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "prebuild": "rimraf dist",
@@ -10,7 +10,7 @@
     "debug": "nest start --debug --watch",
     "seed:admin": "ts-node src/app/seed/admin.seed.ts",
     "generate": "prisma generate",
-    "start": "node dist/main",
+    "start": "node dist/src/main",
     "migrate": "prisma migrate dev",
     "migrate:prod": "prisma migrate deploy",
     "lint": "eslint '{src,test}/**/*.{js,ts}'",
