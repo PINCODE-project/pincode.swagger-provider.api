@@ -10,7 +10,7 @@
     "debug": "nest start --debug --watch",
     "seed:admin": "ts-node src/app/seed/admin.seed.ts",
     "generate": "prisma generate",
-    "start": "node dist/src/main",
+    "start": "node dist/main",
     "migrate": "prisma migrate dev",
     "migrate:prod": "prisma migrate deploy",
     "lint": "eslint '{src,test}/**/*.{js,ts}'",
