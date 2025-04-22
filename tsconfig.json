@@ -17,10 +17,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "paths": {
       "@/*": ["src/app/*"],
       "@prisma/__generated__": ["prisma/__generated__"],
@@ -28,13 +25,6 @@
     },
     "jsx": "react"
   },
-  "include": [
-    "src",
-    "test"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "*coverage"
-  ]
+  "include": ["src", "test", "tests"],
+  "exclude": ["node_modules", "dist", "*coverage"]
 }

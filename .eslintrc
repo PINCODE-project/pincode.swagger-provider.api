@@ -19,7 +19,7 @@
     "jest": true
   },
   "rules": {
-    "tabWidth": 120,
+    "tabWidth": 4,
     "prettier/prettier": [
       "error",
       {
