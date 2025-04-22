@@ -1,11 +1,4 @@
-import {
-    BadRequestException,
-    ConflictException,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AuthMethod, User } from "@prisma/__generated__";
 import { verify } from "argon2";
 import { JwtService } from "@nestjs/jwt";
