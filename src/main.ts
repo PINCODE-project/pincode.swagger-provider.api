@@ -22,7 +22,7 @@ async function bootstrap() {
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         origin: ["http://localhost:5001", "https://swagger-provider.com", /\.pincode-infra\.ru$/],
         credentials: true,
-        allowedHeaders: ['Content-Type', 'Authorization']
+        allowedHeaders: ["Content-Type", "Authorization"],
     });
 
     setupSwagger(app);

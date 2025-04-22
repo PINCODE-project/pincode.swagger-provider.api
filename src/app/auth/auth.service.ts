@@ -72,7 +72,7 @@ export class AuthService {
             );
         }
 
-        let account = await this.prismaService.account.findFirst({ where: { userId: user.id, provider } });
+        const account = await this.prismaService.account.findFirst({ where: { userId: user.id, provider } });
 
         if (!account) {
             await this.prismaService.account.create({

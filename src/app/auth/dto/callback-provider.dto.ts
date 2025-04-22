@@ -1,5 +1,6 @@
 import { IsEnum, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+
 import { ProviderEnum } from "./connect-to-provider.dto";
 
 export class CallbackProviderParamDto {

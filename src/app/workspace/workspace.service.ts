@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { WorkspaceMemberRole } from "@prisma/__generated__";
 
 import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
-import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
 
 import { PrismaService } from "@/prisma/prisma.service";
 import { AddMemberToWorkspaceDto } from "@/workspace/dto/add-member-to-workspace.dto";

@@ -15,8 +15,8 @@ export class FindAllProjectByWorkspaceResponseMicroserviceDto {
     @ApiProperty()
     name: string;
 
-    @ApiProperty({type: "enum", enum: MicroserviceType })
-    type: MicroserviceType
+    @ApiProperty({ type: "enum", enum: MicroserviceType })
+    type: MicroserviceType;
 }
 
 export class FindAllProjectByWorkspaceResponseProjectDto {

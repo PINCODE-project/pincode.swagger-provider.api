@@ -1,13 +1,15 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Prisma } from "@prisma/__generated__";
+
 import { SnippetService } from "./snippet.service";
 import { CreateSnippetDto } from "./dto/create-snippet.dto";
 import { UpdateSnippetDto, UpdateSnippetParamDto } from "./dto/update-snippet.dto";
-import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+
 import { Authorized } from "@/auth/decorators/authorized.decorator";
 import { Authorization } from "@/auth/decorators/auth.decorator";
 import { RemoveSnippetParamDto } from "@/snippet/dto/remove-snippet.dto";
 import { getBadRequestErrors } from "@/libs/common/utils/get-errors";
-import { Prisma } from "@prisma/__generated__";
 import SnippetScalarFieldEnum = Prisma.SnippetScalarFieldEnum;
 
 @ApiTags("snippet")

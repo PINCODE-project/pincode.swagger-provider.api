@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+
 import { FindWorkspaceResponsePartDto } from "./find-workspace.dto";
 
 export class FindAllWorkspaceResponseDto {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch } from "@nestjs/common";
 import { UserRole } from "@prisma/__generated__";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 

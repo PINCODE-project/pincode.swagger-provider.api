@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
+
 import { CreateSnippetDto } from "./dto/create-snippet.dto";
 import { UpdateSnippetDto } from "./dto/update-snippet.dto";
+
 import { PrismaService } from "@/prisma/prisma.service";
 
 @Injectable()

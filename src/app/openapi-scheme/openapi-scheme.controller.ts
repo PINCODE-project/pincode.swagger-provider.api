@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+
 import { OpenapiSchemeService } from "./openapi-scheme.service";
 import { CreateOpenapiSchemeDto } from "./dto/create-openapi-scheme.dto";
 import { UpdateOpenapiSchemeDto } from "./dto/update-openapi-scheme.dto";
-import { ApiTags } from "@nestjs/swagger";
 
 @ApiTags("openapi-scheme")
 @Controller("openapi-scheme")

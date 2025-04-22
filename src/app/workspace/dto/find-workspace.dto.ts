@@ -1,6 +1,7 @@
 import { IsUUID } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { $Enums } from "@prisma/__generated__";
+
 import UserRole = $Enums.UserRole;
 
 export class FindWorkspaceDto {
@@ -31,13 +32,13 @@ export class FindWorkspaceResponsePartDto {
     description: string;
 
     @ApiProperty({ type: "string", format: "datetime" })
-    createdAt: Date
+    createdAt: Date;
 
     @ApiProperty({ type: "string", format: "datetime" })
-    updatedAt: Date
+    updatedAt: Date;
 
     @ApiProperty({ type: () => FindWorkspaceResponseMemberDto, isArray: true })
-    members: FindWorkspaceResponseMemberDto[]
+    members: FindWorkspaceResponseMemberDto[];
 }
 
 export class FindWorkspaceResponseDto {

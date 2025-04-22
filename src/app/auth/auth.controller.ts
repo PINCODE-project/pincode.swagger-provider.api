@@ -20,6 +20,7 @@ import { LoginDto, LoginResponseDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { AuthProviderGuard } from "./guards/provider.guard";
 import { ProviderService } from "./provider/provider.service";
+
 import { ConnectToProviderDto, ConnectToProviderResponseDto } from "@/auth/dto/connect-to-provider.dto";
 import { CallbackProviderParamDto, CallbackProviderQueryDto } from "@/auth/dto/callback-provider.dto";
 import { getBadRequestErrors } from "@/libs/common/utils/get-errors";

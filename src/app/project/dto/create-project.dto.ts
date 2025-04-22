@@ -36,16 +36,15 @@ export class CreateProjectResponseProjectDto {
     description?: string;
 
     @ApiProperty({ type: "string", format: "date-time" })
-    createdAt: Date
+    createdAt: Date;
 
     @ApiProperty({ type: "string", format: "date-time" })
-    updatedAt: Date
+    updatedAt: Date;
 
     @ApiProperty({ type: "string", format: "uuid" })
     @IsUUID()
     workspaceId: string;
 }
-
 
 export class CreateProjectResponseDto {
     @ApiProperty({ type: () => CreateProjectResponseProjectDto })

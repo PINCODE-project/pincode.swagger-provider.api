@@ -1,8 +1,10 @@
 import { applyDecorators, UseGuards } from "@nestjs/common";
 import { UserRole } from "@prisma/__generated__";
+import { ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
+
 import { RolesGuard } from "../guards/roles.guard";
 import { Roles } from "./roles.decorator";
-import { ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
+
 import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
 import { getUnauthorizedError } from "@/libs/common/utils/get-errors";
 
