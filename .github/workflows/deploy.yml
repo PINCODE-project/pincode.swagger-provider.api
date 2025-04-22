@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,8 +18,48 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_CATDEV }}
 
+      - name: Install dependencies
+        run: |
+          cd pincode.swagger-provider.api
+          yarn install
+
+      - name: Build project
+        run: |
+          cd pincode.swagger-provider.api
+          sudo docker-compose up -d --build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          cd pincode.swagger-provider.api
+          yarn install
+
+      - name: Run API tests
+        run: |
+          cd pincode.swagger-provider.api
+          yarn test:api
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_CATDEV }}
+
       - name: Deploy to Server
         run: |
+          cd pincode.swagger-provider.api
           ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
             cd pincode.swagger-provider.api &&
             eval $(ssh-agent -s) &&
@@ -28,17 +68,3 @@ jobs:
             sudo docker compose up -d --build &&
             sudo docker system prune -af
           '
-  test:
-    runs-on: ubuntu-latest
-    needs: deploy
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: |
-          yarn install
-
-      - name: Run API tests
-        run: |
-          yarn test:api
