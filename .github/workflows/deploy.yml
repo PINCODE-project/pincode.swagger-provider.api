@@ -44,7 +44,7 @@ jobs:
       - name: Wait for container to be ready
         run: |
           ssh -o StrictHostKeyChecking=no -p 2324 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST_CATDEV }} '
-            until sudo docker ps | grep -q "swagger-provider-api"; do
+            until sudo docker ps | grep -q "backend-swagger"; do
               echo "Waiting for container to start...";
               sleep 5;
             done;
