@@ -2,7 +2,6 @@ import { join } from "path";
 
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { TerminusModule } from "@nestjs/terminus";
 import { ServeStaticModule } from "@nestjs/serve-static";
 
@@ -17,23 +16,11 @@ import { MicroserviceModule } from "./microservice/microservice.module";
 import { SnippetModule } from "./snippet/snippet.module";
 import { OpenapiSchemeModule } from "./openapi-scheme/openapi-scheme.module";
 
-import { ResponseInterceptor } from "@/interceptors/response.interceptor";
 import { LoggingMiddleware } from "@/middlewares/logging.middleware";
 import { AppController } from "@/app.controller";
-import { HttpExceptionFilter } from "@/filters/http.exception.filter";
 
 @Module({
     controllers: [AppController],
-    providers: [
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: ResponseInterceptor,
-        },
-        {
-            provide: APP_FILTER,
-            useClass: HttpExceptionFilter,
-        },
-    ],
     imports: [
         ConfigModule.forRoot({
             ignoreEnvFile: !IS_DEV_ENV,

@@ -1,5 +1,5 @@
 import { MicroserviceType } from "@prisma/__generated__";
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateMicroserviceDto {

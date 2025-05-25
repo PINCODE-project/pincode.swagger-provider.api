@@ -1,13 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
-import { Request } from "express";
 
 import { MicroserviceService } from "./microservice.service";
 import { CreateMicroserviceDto } from "./dto/create-microservice.dto";
 
 import { Authorization } from "@/auth/decorators/auth.decorator";
-import { GetMicroserviceDto } from "@/microservice/dto/get-microservice.dto";
+import { GetMicroserviceDto, GetMicroserviceResponseDto } from "@/microservice/dto/get-microservice.dto";
 import { Authorized } from "@/auth/decorators/authorized.decorator";
+import { ApiBaseResponse } from "@/libs/common/utils/base-response";
 
 @ApiTags("microservice")
 @Controller("microservice")
@@ -23,6 +23,7 @@ export class MicroserviceController {
     }
 
     @ApiOperation({ summary: "Получение схемы" })
+    @ApiBaseResponse(GetMicroserviceResponseDto, "Объект микросервиса")
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get(":id")
