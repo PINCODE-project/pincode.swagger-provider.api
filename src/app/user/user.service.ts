@@ -39,12 +39,6 @@ export class UserService {
             },
         });
 
-        if (!user) {
-            throw new NotFoundException("Пользователь не найден. Пожалуйста, проверьте введенные данные.");
-        }
-
-        delete user.password;
-
         return user;
     }
 

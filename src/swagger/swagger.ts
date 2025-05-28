@@ -12,7 +12,7 @@ export const setupSwagger = (app: INestApplication) => {
     const docName: string = `${configService.getOrThrow<string>("APP_NAME")} Documentation`;
     const docDesc: string = "Сервис для объединения Swagger схем в одном месте";
     const docVersion: string = "1.0";
-    const docPrefix: string = "/core/docs";
+    const docPrefix: string = "/api/core/docs";
 
     const documentBuild = new DocumentBuilder()
         .setTitle(docName)
