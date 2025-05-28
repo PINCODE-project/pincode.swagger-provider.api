@@ -7,6 +7,8 @@ import { UserService } from "./user.service";
 
 import { Authorization } from "@/auth/decorators/auth.decorator";
 import { Authorized } from "@/auth/decorators/authorized.decorator";
+import { GetProfileResponseDto } from "@/user/dto/get-profile.dto";
+import { ApiBaseResponse } from "@/libs/common/utils/base-response";
 
 @ApiTags("user")
 @Controller("user")
@@ -14,11 +16,11 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @ApiOperation({ summary: "Получение профиля пользователя" })
+    @ApiBaseResponse(GetProfileResponseDto, "Профиль пользователя")
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get("profile")
-    // public async findProfile(@Req() req) {
-    public async findProfile(@Authorized("id") userId: string) {
+    findProfile(@Authorized("id") userId: string) {
         return this.userService.findById(userId);
     }
 
@@ -26,7 +28,7 @@ export class UserController {
     @Authorization(UserRole.ADMIN)
     @HttpCode(HttpStatus.OK)
     @Get("by-id/:id")
-    public async findById(@Param("id") id: string) {
+    findById(@Param("id") id: string) {
         return this.userService.findById(id);
     }
 
@@ -34,7 +36,7 @@ export class UserController {
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Patch("profile")
-    public async updateProfile(@Authorized("id") userId: string, @Body() dto: UpdateUserDto) {
+    updateProfile(@Authorized("id") userId: string, @Body() dto: UpdateUserDto) {
         return this.userService.update(userId, dto);
     }
 }

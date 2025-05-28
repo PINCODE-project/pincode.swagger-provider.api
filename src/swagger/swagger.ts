@@ -18,16 +18,15 @@ export const setupSwagger = (app: INestApplication) => {
         .setTitle(docName)
         .setDescription(docDesc)
         .setVersion(docVersion)
-        .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "accessToken")
-        .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "refreshToken");
+        .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "accessToken");
 
     _SWAGGER_TAGS.forEach((tag) => {
         documentBuild.addTag(tag.name, tag.description);
     });
 
     const documentBuilt = documentBuild
-        .addServer("https://backend-swagger.pincode-infra.ru/")
         .addServer("http://localhost:9001")
+        .addServer("https://backend-swagger.pincode-infra.ru/")
         .build();
 
     const document = SwaggerModule.createDocument(app, documentBuilt, {

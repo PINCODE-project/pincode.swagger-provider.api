@@ -21,3 +21,8 @@ export class RegisterDto {
     })
     password: string;
 }
+
+export class RegisterResponseDto {
+    @ApiProperty({ example: "Вы успешно зарегистрировались." })
+    message: string;
+}

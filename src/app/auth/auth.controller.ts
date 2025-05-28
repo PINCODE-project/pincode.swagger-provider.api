@@ -17,7 +17,7 @@ import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedRespo
 
 import { AuthService } from "./auth.service";
 import { LoginDto, LoginResponseDto } from "./dto/login.dto";
-import { RegisterDto } from "./dto/register.dto";
+import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
 import { AuthProviderGuard } from "./guards/provider.guard";
 import { ProviderService } from "./provider/provider.service";
 
@@ -37,6 +37,7 @@ export class AuthController {
 
     @ApiOperation({ summary: "Регистрация пользователя" })
     @Post("register")
+    @ApiBaseResponse(RegisterResponseDto, "Пользователь успешно зарегистрировался")
     @HttpCode(HttpStatus.OK)
     public async register(@Body() dto: RegisterDto) {
         return this.authService.register(dto);
