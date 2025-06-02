@@ -19,7 +19,7 @@ export class PaymentController {
     }
 
     @ApiOperation({summary: 'Изменении статуса платежа'})
-    @Get("callback")
+    @Post("callback")
     callback(@Body() dto: any) {
         return this.paymentService.callback(dto);
     }
