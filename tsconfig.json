@@ -18,11 +18,24 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@/*": ["src/app/*"],
-      "@prisma": ["generated/prisma"],
-      "@prisma/*": ["generated/prisma/*"]
+      "@/*": [
+        "src/app/*"
+      ],
+      "@prisma": [
+        "generated/prisma"
+      ],
+      "@prisma/*": [
+        "generated/prisma/*"
+      ]
     }
   },
-  "include": ["src", "test"],
-  "exclude": ["node_modules", "dist", "*coverage"]
+  "include": [
+    "src",
+    "test"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "*coverage"
+  ]
 }
