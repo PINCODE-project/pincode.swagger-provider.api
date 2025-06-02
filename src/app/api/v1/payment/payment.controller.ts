@@ -18,8 +18,14 @@ export class PaymentController {
         return this.paymentService.createPayment(userId, dto);
     }
 
-    @ApiOperation({summary: 'Изменении статуса платежа'})
+    @ApiOperation({summary: 'Проверка ручки для изменения статуса платежа'})
     @Get("callback")
+    callbackHealty() {
+        return true;
+    }
+
+    @ApiOperation({summary: 'Изменение статуса платежа'})
+    @Post("callback")
     callback(@Body() dto: any) {
         return this.paymentService.callback(dto);
     }
