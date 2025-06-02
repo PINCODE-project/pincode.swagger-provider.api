@@ -1,23 +1,20 @@
-import { join } from "path";
-
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
+import { AppController } from "./app.controller";
 import { TerminusModule } from "@nestjs/terminus";
-import { ServeStaticModule } from "@nestjs/serve-static";
-
-import { AuthModule } from "./auth/auth.module";
-import { ProviderModule } from "./auth/provider/provider.module";
-import { IS_DEV_ENV } from "./libs/common/utils/is-dev.util";
-import { PrismaModule } from "./prisma/prisma.module";
-import { UserModule } from "./user/user.module";
-import { WorkspaceModule } from "./workspace/workspace.module";
-import { ProjectModule } from "./project/project.module";
-import { MicroserviceModule } from "./microservice/microservice.module";
-import { SnippetModule } from "./snippet/snippet.module";
-import { OpenapiSchemeModule } from "./openapi-scheme/openapi-scheme.module";
-
-import { LoggingMiddleware } from "@/middlewares/logging.middleware";
-import { AppController } from "@/app.controller";
+import { PrismaModule } from "@/modules/prisma/prisma.module";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { IS_DEV_ENV } from "@/common/utils/is-dev.util";
+import { LoggingMiddleware } from "@/common/middlewares/logging.middleware";
+import { AuthModule } from "@/api/v1/auth/auth.module";
+import { UserModule } from "@/api/v1/user/user.module";
+import { ProviderModule } from "@/modules/auth/provider/provider.module";
+import { BotModule } from "@/bot/bot.module";
+import { TelegramAccountModule } from "./api/v1/telegram-account/telegram-account.module";
+import { WorkspaceModule } from "@/api/v1/workspace/workspace.module";
+import { ProjectModule } from "@/api/v1/project/project.module";
+import { YookassaModule } from "nestjs-yookassa";
+import { PaymentModule } from './api/v1/payment/payment.module';
+import { MicroserviceModule } from "@/api/v1/microservice/microservice.module";
 
 @Module({
     controllers: [AppController],
@@ -26,24 +23,30 @@ import { AppController } from "@/app.controller";
             ignoreEnvFile: !IS_DEV_ENV,
             isGlobal: true,
         }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, "..", "..", "static"),
-            serveRoot: "/api/static",
+        YookassaModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                shopId: configService.getOrThrow("YOOKASSA_SHOP_ID"),
+                apiKey: configService.getOrThrow("YOOKASSA_SECRET_KEY"),
+            }),
         }),
+        TerminusModule,
         PrismaModule,
+        BotModule,
         AuthModule,
         UserModule,
         ProviderModule,
         WorkspaceModule,
         ProjectModule,
         MicroserviceModule,
-        SnippetModule,
-        TerminusModule,
-        OpenapiSchemeModule,
+        // AdminUserModule,
+        TelegramAccountModule,
+        PaymentModule,
     ],
 })
-export class AppModule implements NestModule {
+export class AppModule {
     configure(consumer: MiddlewareConsumer): void {
-        consumer.apply(LoggingMiddleware).forRoutes("*");
+        consumer.apply(LoggingMiddleware).forRoutes("/*path");
     }
 }

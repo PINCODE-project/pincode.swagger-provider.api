@@ -1,10 +1,10 @@
 import { Controller, Get } from "@nestjs/common";
-import { HealthCheck, HealthCheckService } from "@nestjs/terminus";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { HealthCheck, HealthCheckService } from "@nestjs/terminus";
+import { PrismaService } from "@/modules/prisma/prisma.service";
 
-import { PrismaService } from "./prisma/prisma.service";
-
-@Controller()
+@ApiTags("system")
+@Controller("v1")
 export class AppController {
     constructor(
         private readonly healthCheckService: HealthCheckService,
@@ -12,7 +12,6 @@ export class AppController {
     ) {}
 
     @ApiOperation({ summary: "Проверка работоспособности БД" })
-    @ApiTags("system")
     @Get("/health")
     @HealthCheck()
     public async getHealth() {

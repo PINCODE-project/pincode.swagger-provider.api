@@ -1,0 +1,17 @@
+model Project {
+  id String @id @default(uuid())
+
+  name        String
+  icon        String?
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String    @map("workspace_id")
+
+  microservices Microservice[]
+
+  @@map("project")
+}

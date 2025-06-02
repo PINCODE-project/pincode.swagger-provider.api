@@ -1,0 +1,34 @@
+model Payment {
+  id String @id @default(uuid())
+
+  paymentId   String?       @map("payment_id")
+  type        PaymentType
+  amount      Int
+  description String
+  status      PaymentStatus
+
+  recipientAccountId String? @map("recipient_account_id")
+  recipientGatewayId String? @map("recipient_gateway_id")
+
+  isTest      Boolean? @default(false) @map("is_test")
+  isProcessed Boolean  @default(false) @map("is_processed")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @map("user_id")
+
+  @@map("payment")
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+}
+
+enum PaymentStatus {
+  pendind
+  succeeded
+  waiting_for_capture
+  canceled
+}

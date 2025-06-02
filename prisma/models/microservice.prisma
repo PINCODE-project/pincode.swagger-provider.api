@@ -1,0 +1,64 @@
+model Microservice {
+  id String @id @default(uuid())
+
+  name String
+  type MicroserviceType
+
+  isUpdateByGetScheme Boolean @default(true) @map("is_update_by_get_scheme")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String  @map("project_id")
+
+  servers Server[]
+  schemes Scheme[]
+
+  @@map("microservice")
+}
+
+model Scheme {
+  id String @id @default(uuid())
+
+  version    Int
+  content    String?
+  cache      String?
+  updateType SchemeUpdateType
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  microservice   Microservice? @relation(fields: [microserviceId], references: [id], onDelete: Cascade)
+  microserviceId String?       @map("microservice_id")
+
+  @@map("scheme")
+}
+
+model Server {
+  id String @id @default(uuid())
+
+  url         String
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  microservice   Microservice? @relation(fields: [microserviceId], references: [id], onDelete: Cascade)
+  microserviceId String?       @map("microservice_id")
+
+  @@map("server")
+}
+
+enum MicroserviceType {
+  URL
+  TEXT
+}
+
+enum SchemeUpdateType {
+  INIT
+  WEBHOOK
+  GET_REQUEST
+  MANUAL
+  CLI
+}

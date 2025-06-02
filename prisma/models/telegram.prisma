@@ -1,0 +1,33 @@
+model UserTelegramAccounts {
+  id String @id @default(uuid())
+
+  telegramId Int
+  firstName  String
+  lastName   String
+  username   String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @map("user_id")
+
+  @@map("telegram_account")
+}
+
+model UserTelegramCode {
+  id String @id @default(uuid())
+
+  code       String
+  telegramId Int    @map("telegram_id")
+  firstName  String @map("first_name")
+  lastName   String @map("last_name")
+  username   String
+
+  expiresAt DateTime @default(now()) @map("expires_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("telegram_code")
+}

@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/yarn.lock /app/
 COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/prisma /app/prisma
-COPY --from=builder /app/static /app/static
+COPY --from=builder /app/generated /app/generated
 
 RUN apk add --no-cache openssl
 

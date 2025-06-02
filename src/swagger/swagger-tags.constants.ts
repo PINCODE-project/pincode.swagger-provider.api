@@ -1,4 +1,4 @@
-export const _SWAGGER_TAGS = [
+export const SWAGGER_TAGS = [
     {
         name: "auth",
         description: "Работа с авторизацией пользователей",
@@ -17,10 +17,20 @@ export const _SWAGGER_TAGS = [
     },
     {
         name: "microservice",
-        description: "Работа с OpenApi схемами",
+        description: "Работа с микросервисами (Схемами)",
+    },
+    {
+        name: "telegram",
+        description: "Работа с аккаунтами в Telegram",
+    },
+    {
+        name: "admin-user",
+        description: "Админское управление пользователями",
     },
     {
         name: "system",
         description: "Системные операции",
     },
 ];
+
+export const SWAGGER_SERVERS = ["http://localhost:9001", "https://backend-swagger.pincode-infra.ru/"];

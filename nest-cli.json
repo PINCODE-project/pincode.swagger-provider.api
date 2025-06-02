@@ -1,12 +1,8 @@
 {
+  "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src/app",
+  "sourceRoot": "src/app/api/v1",
   "compilerOptions": {
-    "assets": [
-      {
-        "include": "languages/**/*",
-        "watchAssets": true
-      }
-    ]
+    "deleteOutDir": true
   }
 }

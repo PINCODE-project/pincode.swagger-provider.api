@@ -2,8 +2,8 @@ import { INestApplication, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from "@nestjs/swagger";
 
-import { SwaggerUI } from "./swagger-ui.class";
-import { _SWAGGER_TAGS } from "./swagger-tags.constants";
+import { SWAGGER_SERVERS, SWAGGER_TAGS } from "./swagger-tags.constants";
+import { styles } from "./swagger-styles";
 
 export const setupSwagger = (app: INestApplication) => {
     const configService = app.get(ConfigService);
@@ -20,38 +20,38 @@ export const setupSwagger = (app: INestApplication) => {
         .setVersion(docVersion)
         .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "accessToken");
 
-    _SWAGGER_TAGS.forEach((tag) => {
+    SWAGGER_TAGS.forEach((tag) => {
         documentBuild.addTag(tag.name, tag.description);
     });
 
-    const documentBuilt = documentBuild
-        .addServer("http://localhost:9001")
-        .addServer("https://backend-swagger.pincode-infra.ru/")
-        .build();
+    SWAGGER_SERVERS.forEach((server) => {
+        documentBuild.addServer(server);
+    });
+
+    const documentBuilt = documentBuild.build();
 
     const document = SwaggerModule.createDocument(app, documentBuilt, {
         deepScanRoutes: true,
     });
+
     const customOptions: SwaggerCustomOptions = {
         swaggerOptions: {
-            docExpansion: "none",
+            docExpansion: "list",
             persistAuthorization: true,
-            displayOperationId: true,
+            displayOperationId: false,
             operationsSorter: "method",
             tryItOutEnabled: true,
-            filter: true,
+            filter: false,
         },
+        customCss: styles,
     };
-
-    const swaggerUI = new SwaggerUI(configService.get<string>("APPLICATION_URL"));
 
     SwaggerModule.setup(docPrefix, app, document, {
         jsonDocumentUrl: `${docPrefix}-json`,
-        explorer: true,
+        explorer: false,
         customSiteTitle: docName,
         customSwaggerUiPath: "./node_modules/swagger-ui-dist",
         ...customOptions,
-        ...swaggerUI.customOptions,
     });
     logger.log(`📄 Swagger will serve on ${docPrefix}`);
 };

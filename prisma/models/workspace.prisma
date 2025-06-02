@@ -1,0 +1,40 @@
+model Workspace {
+  id String @id @default(uuid())
+
+  name        String
+  icon        String?
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projects Project[]
+  snippets Snippet[]
+  members  WorkspaceMember[]
+
+  @@map("workspace")
+}
+
+model WorkspaceMember {
+  id String @id @default(uuid())
+
+  role WorkspaceMemberRole
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String?    @map("workspace_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@map("workspace_member")
+}
+
+enum WorkspaceMemberRole {
+  READER
+  REGULAR
+  ADMIN
+  SUPERADMIN
+}
