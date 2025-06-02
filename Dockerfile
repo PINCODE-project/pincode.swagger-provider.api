@@ -30,4 +30,4 @@ RUN yarn install --production --frozen-lockfile
 
 EXPOSE 9001
 
-CMD [ "yarn", "start" ]
+CMD [ "yarn", "start:prod" ]
