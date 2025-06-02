@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { CurrencyEnum, PaymentCreateRequest, PaymentMethodsEnum, YookassaService } from "nestjs-yookassa";
 import { PrismaService } from "@/modules/prisma/prisma.service";
@@ -6,6 +6,8 @@ import { PaymentStatus } from "@prisma";
 
 @Injectable()
 export class PaymentService {
+    private readonly logger = new Logger("PaymentService");
+
     constructor(
         private readonly yookassaService: YookassaService,
         private readonly prismaService: PrismaService
@@ -61,6 +63,6 @@ export class PaymentService {
     }
 
     async callback(dto: any) {
-        console.log(dto);
+        this.logger.log(dto, JSON.stringify(dto));
     }
 }
