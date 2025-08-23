@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from "@nestjs/sw
 
 import { SWAGGER_SERVERS, SWAGGER_TAGS } from "./swagger-tags.constants";
 import { styles } from "./swagger-styles";
+import { JWT_COOKIE_NAME } from "@/modules/auth/auth.constants";
 
 export const setupSwagger = (app: INestApplication) => {
     const configService = app.get(ConfigService);
@@ -18,7 +19,13 @@ export const setupSwagger = (app: INestApplication) => {
         .setTitle(docName)
         .setDescription(docDesc)
         .setVersion(docVersion)
-        .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "accessToken");
+        .addCookieAuth(JWT_COOKIE_NAME, {
+            type: "apiKey",
+            in: "cookie",
+            name: JWT_COOKIE_NAME,
+            description: "JWT токен в httpOnly куки для авторизации",
+        })
+        .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" }, "accessToken-header");
 
     SWAGGER_TAGS.forEach((tag) => {
         documentBuild.addTag(tag.name, tag.description);

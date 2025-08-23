@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@/app.module";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import * as cookieParser from "cookie-parser";
 import { setupSwagger } from "./swagger/swagger";
 
 async function bootstrap() {
@@ -14,11 +15,14 @@ async function bootstrap() {
     const port: number = configService.getOrThrow<number>("APPLICATION_PORT");
     const host: string = configService.getOrThrow<string>("APPLICATION_HOST");
 
+    app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
     app.enableCors({
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         origin: [
+            "https://localhost:3000",
+            "http://localhost:3000",
             "http://localhost:5001",
             "https://swagger-provider.com",
             /\.pincode-infra\.ru$/,

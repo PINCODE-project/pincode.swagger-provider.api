@@ -5,7 +5,7 @@ export class CreatePaymentDto {
     @ApiProperty({ description: "Товар", example: PaymentType.SUBSCRIPTION })
     type: PaymentType
 
-    @ApiProperty({ description: "Сумму оплаты", example: 250 })
+    @ApiProperty({ description: "Сумма оплаты", example: 250 })
     amount: number;
 
     @ApiProperty({ description: "Описание заказа", example: "Подписка на сервис Swagger Provider" })

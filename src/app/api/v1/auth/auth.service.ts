@@ -2,12 +2,14 @@ import { BadRequestException, ConflictException, Injectable, UnauthorizedExcepti
 import { AuthMethod, User } from "@prisma";
 import { verify } from "argon2";
 import { JwtService } from "@nestjs/jwt";
+import { Response } from "express";
 
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { PrismaService } from "@/modules/prisma/prisma.service";
 import { UserService } from "@/api/v1/user/user.service";
 import { ProviderService } from "@/modules/auth/provider/provider.service";
+import { JWT_COOKIE_NAME, COOKIE_OPTIONS, CLEAR_COOKIE_OPTIONS } from "@/modules/auth/auth.constants";
 
 @Injectable()
 export class AuthService {
@@ -39,7 +41,7 @@ export class AuthService {
         }
     }
 
-    public async login(dto: LoginDto) {
+    public async login(dto: LoginDto, res: Response) {
         const user = await this.userService.findByEmail(dto.email);
 
         if (!user || !user.password) {
@@ -52,10 +54,10 @@ export class AuthService {
             throw new UnauthorizedException("Wrong password!");
         }
 
-        return this.generateToken(user, "");
+        return this.generateToken(user, "", res);
     }
 
-    public async extractProfileFromCode(provider: string, code: string) {
+    public async extractProfileFromCode(provider: string, code: string, res: Response) {
         const providerInstance = this.providerService.findByService(provider);
         const profile = await providerInstance!.findUserByCode(code);
 
@@ -90,13 +92,23 @@ export class AuthService {
             });
         }
 
-        return this.generateToken(user, provider);
+        return this.generateToken(user, provider, res);
     }
 
-    public generateToken(user: User, provider: string) {
+    public generateToken(user: User, provider: string, res: Response) {
         const payload = { id: user.id, email: user.email, role: user.role, provider };
         const accessToken = this.jwtService.sign(payload);
 
+        // Устанавливаем токен в httpOnly куки для безопасности
+        res.cookie(JWT_COOKIE_NAME, accessToken, COOKIE_OPTIONS);
+
         return { accessToken };
+    }
+
+    public logout(res: Response) {
+        // Очищаем куки с токеном
+        res.clearCookie(JWT_COOKIE_NAME, CLEAR_COOKIE_OPTIONS);
+
+        return { message: "Successfully logged out" };
     }
 }

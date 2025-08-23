@@ -23,6 +23,7 @@ import { CallbackProviderParamDto, CallbackProviderQueryDto } from "./dto/callba
 import { ConnectToProviderDto, ConnectToProviderResponseDto } from "./dto/connect-to-provider.dto";
 import { ProviderService } from "@/modules/auth/provider/provider.service";
 import { AuthProviderGuard } from "@/modules/auth/guards/provider.guard";
+import { Authorization } from "@/modules/auth/decorators/auth.decorator";
 
 @ApiTags("auth")
 @Controller("/v1/auth")
@@ -58,14 +59,14 @@ export class AuthController {
     )
     @HttpCode(HttpStatus.OK)
     @Post("login")
-    public async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+    public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+        return this.authService.login(dto, res);
     }
 
     @ApiOperation({
         summary: "Авторизация через Oauth",
         description: `Используется провайдерами\n
-Перенаправляет на фронт по адресу вместе с токеном /auth/callback?accessToken=ТОКЕН (Адрес фронта лежит в env - ALLOWED_ORIGIN)`,
+Перенаправляет на фронт по адресу /auth/callback (Адрес фронта лежит в env - ALLOWED_ORIGIN). Токен устанавливается в куки.`,
     })
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/callback/:provider")
@@ -78,11 +79,9 @@ export class AuthController {
             throw new BadRequestException("Не был предоставлен код авторизации.");
         }
 
-        const token = await this.authService.extractProfileFromCode(paramDto.provider, queryDto.code);
+        await this.authService.extractProfileFromCode(paramDto.provider, queryDto.code, res);
 
-        res.redirect(
-            `${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback?accessToken=${token.accessToken}`,
-        );
+        res.redirect(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback`);
     }
 
     @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
@@ -95,5 +94,13 @@ export class AuthController {
         return {
             url: providerInstance!.getAuthUrl(),
         };
+    }
+
+    @ApiOperation({ summary: "Выход из системы (очистка куки)" })
+    @ApiBaseResponse(200, LoginResponseDto, "Пользователь успешно вышел из системы")
+    @Post("logout")
+    @HttpCode(HttpStatus.OK)
+    public async logout(@Res({ passthrough: true }) res: Response) {
+        return this.authService.logout(res);
     }
 }

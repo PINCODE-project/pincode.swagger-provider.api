@@ -16,12 +16,12 @@ export class TelegramAccountController {
 
     @ApiOperation({ summary: "Привязка пользователя к телеграм аккаунту по коду" })
     @ApiBaseResponse(200, ConnectUserToTelegramResponseDto, "Пользователь успешно привязан")
-    @ApiErrorResponse(404, "СonnectUserToTelegram", "Code invalid!", "Код не действителен")
-    @ApiErrorResponse(409, "СonnectUserToTelegramConflict", "Account already connected!", "Аккаунт уже привязан")
+    @ApiErrorResponse(404, "ConnectUserToTelegram", "Code invalid!", "Код не действителен")
+    @ApiErrorResponse(409, "ConnectUserToTelegramConflict", "Account already connected!", "Аккаунт уже привязан")
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Post("connect/:code")
-    connectUserToTelegram(@Authorized("id") userId: string, @Param() dto: ConnectUserToTelegramDto) {
+    connectToTelegram(@Authorized("id") userId: string, @Param() dto: ConnectUserToTelegramDto) {
         return this.telegramAccountService.connectUserToTelegram(userId, dto);
     }
 }

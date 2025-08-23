@@ -20,7 +20,7 @@ export class PaymentController {
 
     @ApiOperation({summary: 'Проверка ручки для изменения статуса платежа'})
     @Get("callback")
-    callbackHealty() {
+    callbackHealthy() {
         return true;
     }
 
