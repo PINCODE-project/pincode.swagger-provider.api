@@ -16,7 +16,7 @@ export const COOKIE_OPTIONS = {
 // Настройки куки для очистки
 export const CLEAR_COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "none" as const,
 };
 

@@ -3,6 +3,8 @@ import { AppModule } from "@/app.module";
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as cookieParser from "cookie-parser";
+import { urlencoded, json } from 'express';
+
 import { setupSwagger } from "./swagger/swagger";
 
 async function bootstrap() {
@@ -18,6 +20,8 @@ async function bootstrap() {
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix(globalPrefix);
+    app.use(json({ limit: '50mb' }));
+    app.use(urlencoded({ extended: true, limit: '50mb' }));
     app.enableCors({
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         origin: [

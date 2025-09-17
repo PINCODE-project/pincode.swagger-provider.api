@@ -40,7 +40,7 @@ export class WorkspaceService {
             role: WorkspaceMemberRole.SUPERADMIN,
         });
 
-        return workspace;
+        return { workspace };
     }
 
     async addMemberToWorkspace(dto: AddMemberToWorkspaceDto) {
