@@ -1,0 +1,27 @@
+model Subscription {
+  id String @id @default(uuid())
+
+  status    SubscriptionStatus @default(ACTIVE)
+  autoRenew Boolean            @default(true) @map("auto_renew")
+
+  startDate DateTime  @default(now()) @map("start_date")
+  endDate   DateTime? @map("end_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  paymentId String?  @unique @map("payment_id")
+  payment   Payment? @relation("SubscriptionPayment", fields: [paymentId], references: [id], onDelete: SetNull)
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscription")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELED
+  PENDING
+}

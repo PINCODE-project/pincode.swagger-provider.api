@@ -13,17 +13,16 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express";
-import { ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiTags } from "@nestjs/swagger";
 
 import { AuthService } from "./auth.service";
-import { LoginDto, LoginResponseDto } from "./dto/login.dto";
-import { RegisterDto, RegisterResponseDto } from "./dto/register.dto";
-import { ApiBaseResponse, ApiErrorResponse } from "@/common/utils/base-response";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { CallbackProviderParamDto, CallbackProviderQueryDto } from "./dto/callback-provider.dto";
-import { ConnectToProviderDto, ConnectToProviderResponseDto } from "./dto/connect-to-provider.dto";
+import { ConnectToProviderDto } from "./dto/connect-to-provider.dto";
 import { ProviderService } from "@/modules/auth/provider/provider.service";
 import { AuthProviderGuard } from "@/modules/auth/guards/provider.guard";
-import { Authorization } from "@/modules/auth/decorators/auth.decorator";
+import { ApiRegister, ApiLogin, ApiOauthCallback, ApiOauthConnect, ApiLogout } from "./auth.swagger";
 
 @ApiTags("auth")
 @Controller("/v1/auth")
@@ -34,40 +33,21 @@ export class AuthController {
         private readonly providerService: ProviderService,
     ) {}
 
-    @ApiOperation({ summary: "Регистрация пользователя" })
+    @ApiRegister()
     @Post("register")
-    @ApiBaseResponse(200, RegisterResponseDto, "Пользователь успешно зарегистрировался")
-    @ApiErrorResponse(
-        409,
-        "RegisterUserAlreadyExist",
-        "The user with this email already exists!",
-        "Пользователь уже существует",
-    )
     @HttpCode(HttpStatus.OK)
     public async register(@Body() dto: RegisterDto) {
         return this.authService.register(dto);
     }
 
-    @ApiOperation({ summary: "Авторизация пользователя" })
-    @ApiBaseResponse(200, LoginResponseDto, "Пользователь успешно авторизовался")
-    @ApiErrorResponse(400, "LoginUserNotFound", "User not found!", "Неверные данные")
-    @ApiErrorResponse(
-        401,
-        "LoginWrongPassword",
-        "Wrong password!",
-        "Пользователь существует, но введён неверный пароль",
-    )
+    @ApiLogin()
     @HttpCode(HttpStatus.OK)
     @Post("login")
     public async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
         return this.authService.login(dto, res);
     }
 
-    @ApiOperation({
-        summary: "Авторизация через Oauth",
-        description: `Используется провайдерами\n
-Перенаправляет на фронт по адресу /auth/callback (Адрес фронта лежит в env - ALLOWED_ORIGIN). Токен устанавливается в куки.`,
-    })
+    @ApiOauthCallback()
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/callback/:provider")
     public async callback(
@@ -84,10 +64,9 @@ export class AuthController {
         res.redirect(`${this.configService.getOrThrow<string>("ALLOWED_ORIGIN")}/auth/callback`);
     }
 
-    @ApiOperation({ summary: "Получение ссылки на Oauth авторизацию" })
+    @ApiOauthConnect()
     @UseGuards(AuthProviderGuard)
     @Get("/oauth/connect/:provider")
-    @ApiOkResponse({ type: ConnectToProviderResponseDto })
     public async connect(@Param() dto: ConnectToProviderDto) {
         const providerInstance = this.providerService.findByService(dto.provider);
 
@@ -96,8 +75,7 @@ export class AuthController {
         };
     }
 
-    @ApiOperation({ summary: "Выход из системы (очистка куки)" })
-    @ApiBaseResponse(200, LoginResponseDto, "Пользователь успешно вышел из системы")
+    @ApiLogout()
     @Post("logout")
     @HttpCode(HttpStatus.OK)
     public async logout(@Res({ passthrough: true }) res: Response) {

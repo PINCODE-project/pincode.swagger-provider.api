@@ -1,19 +1,9 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsString } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, PickType } from "@nestjs/swagger";
+import { User } from "@/api/v1/user/entities/user.entity";
 
-export class UpdateUserDto {
-    @ApiProperty()
-    @IsString({ message: "Имя должно быть строкой." })
-    @IsNotEmpty({ message: "Имя обязательно для заполнения." })
-    name: string;
+export class UpdateUserDto extends PickType(User, ["email", "displayName", "isTwoFactorEnabled"]) {}
 
-    @ApiProperty()
-    @IsString({ message: "Email должен быть строкой." })
-    @IsEmail({}, { message: "Некорректный формат email." })
-    @IsNotEmpty({ message: "Email обязателен для заполнения." })
-    email: string;
-
-    @ApiProperty()
-    @IsBoolean({ message: "isTwoFactorEnabled должно быть булевым значением." })
-    isTwoFactorEnabled: boolean;
+export class UpdateUserResponseDto {
+    @ApiProperty({ type: () => User })
+    user: User;
 }

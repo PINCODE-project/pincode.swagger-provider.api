@@ -19,7 +19,7 @@ export class UserService {
             throw new NotFoundException("User not found!");
         }
 
-        return user;
+        return { user };
     }
 
     public async findByEmail(email: string) {
@@ -59,17 +59,19 @@ export class UserService {
     }
 
     public async update(userId: string, dto: UpdateUserDto) {
-        const user = await this.findById(userId);
+        const { user: foundUser } = await this.findById(userId);
 
-        return this.prismaService.user.update({
+        const user = await this.prismaService.user.update({
             where: {
-                id: user.id,
+                id: foundUser.id,
             },
             data: {
                 email: dto.email,
-                displayName: dto.name,
+                displayName: dto.displayName,
                 isTwoFactorEnabled: dto.isTwoFactorEnabled,
             },
         });
+
+        return { user };
     }
 }

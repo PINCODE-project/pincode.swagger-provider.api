@@ -61,4 +61,17 @@ export class BotService {
     async successConnect(telegramId: number) {
         await this.bot.api.sendMessage(telegramId, "🎉 Вы успешно привязали аккаунт!");
     }
+
+    async sendSchemaUpdateNotification(telegramId: number, changelog: string) {
+        try {
+            await this.bot.api.sendMessage(telegramId, changelog, { parse_mode: "MarkdownV2" });
+        } catch (error) {
+            console.error(`Failed to send schema update notification to ${telegramId}:`, error);
+        }
+    }
+
+    async sendSchemaUpdateNotificationToMultiple(telegramIds: number[], changelog: string) {
+        const promises = telegramIds.map((telegramId) => this.sendSchemaUpdateNotification(telegramId, changelog));
+        await Promise.allSettled(promises);
+    }
 }

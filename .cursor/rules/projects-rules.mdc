@@ -19,3 +19,258 @@ alwaysApply: true
 ### Objective
 
 - Создать NestJS-приложение, которое будет соответствовать лучшим практикам в области производительности, безопасности и сопровождаемости.
+
+### Code Style Rules
+
+- **Сообщения об ошибках**: Всегда на английском языке.
+- **Документация и описания**: Всегда на русском языке (Swagger документация, комментарии, описания DTO).
+- **Формат ответов API**: Всегда возвращаем объект с именованной сущностью, а не голую сущность или массив.
+
+    Примеры:
+
+    ✅ Правильно (одиночная сущность):
+
+    ```json
+    {
+        "project": { "id": 1, "name": "Example" }
+    }
+    ```
+
+    ❌ Неправильно:
+
+    ```json
+    { "id": 1, "name": "Example" }
+    ```
+
+    ✅ Правильно (массив сущностей):
+
+    ```json
+    {
+        "projects": [
+            { "id": 1, "name": "Example 1" },
+            { "id": 2, "name": "Example 2" }
+        ]
+    }
+    ```
+
+    ❌ Неправильно:
+
+    ```json
+    [
+        { "id": 1, "name": "Example 1" },
+        { "id": 2, "name": "Example 2" }
+    ]
+    ```
+
+### REST API Structure
+
+Структура модуля для типичного REST API:
+
+```
+src/app/api/v1/entity/
+├── entity.controller.ts    - REST endpoints
+├── entity.swagger.ts       - Swagger документация (декораторы)
+├── entity.service.ts       - Бизнес-логика
+├── entity.module.ts        - NestJS модуль
+├── entities/
+│   └── entity.entity.ts    - Класс сущности (с @ApiProperty и class-validator)
+└── dto/
+    ├── create-entity.dto.ts
+    ├── get-entity.dto.ts
+    ├── update-entity.dto.ts
+    └── delete-entity.dto.ts
+```
+
+#### Пример: entity.entity.ts
+
+```typescript
+import { ApiProperty } from "@nestjs/swagger";
+import { IsBoolean, IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { MicroserviceType } from "@prisma";
+
+export class Microservice {
+    @ApiProperty({
+        type: "string",
+        format: "uuid",
+        description: "ID микросервиса",
+        example: "4dbee41b-de92-497c-84ba-9f4530ad8101",
+    })
+    @IsUUID()
+    id: string;
+
+    @ApiProperty()
+    @IsString({ message: "Название должно быть строкой" })
+    @IsNotEmpty({ message: "Название обязательно для заполнения" })
+    name: string;
+
+    @ApiProperty({ enum: MicroserviceType, example: MicroserviceType.URL })
+    @IsEnum(MicroserviceType)
+    type: MicroserviceType;
+
+    @ApiProperty({ type: "string", format: "date-time", example: "2025-05-31T05:47:11.275Z" })
+    createdAt: string;
+
+    @ApiProperty({ type: "string", format: "date-time", example: "2025-05-31T05:47:11.275Z" })
+    updatedAt: string;
+}
+```
+
+#### Пример: create-entity.dto.ts
+
+```typescript
+import { ApiProperty, PickType } from "@nestjs/swagger";
+import { Microservice } from "@/api/v1/microservice/entities/microservice.entity";
+
+// Входные параметры - используем PickType
+export class CreateMicroserviceDto extends PickType(Microservice, [
+    "name",
+    "type",
+]) {}
+
+// Выходные параметры - всегда объект с именованной сущностью
+export class CreateMicroserviceResponseDto {
+    @ApiProperty({ type: () => Microservice })
+    microservice: Microservice;
+}
+```
+
+#### Пример: entity.swagger.ts
+
+```typescript
+import { applyDecorators } from "@nestjs/common";
+import { ApiOperation } from "@nestjs/swagger";
+import { ApiBaseResponse, ApiErrorResponse } from "@/common/utils/base-response";
+import { CreateMicroserviceResponseDto } from "./dto/create-microservice.dto";
+
+export const ApiCreateMicroservice = () =>
+    applyDecorators(
+        ApiOperation({ summary: "Создание микросервиса" }),
+        ApiBaseResponse(200, CreateMicroserviceResponseDto, "Созданный проект"),
+        ApiErrorResponse(400, "CreateMicroserviceProjectNotFound", "Project not found!", "Проект не найден"),
+        ApiErrorResponse(
+            409,
+            "CreateMicroserviceConflict",
+            "The microservice already exists!",
+            "Микросервис уже существует",
+        ),
+    );
+
+export const ApiGetMicroservice = () =>
+    applyDecorators(
+        ApiOperation({ summary: "Получение микросервиса" }),
+        ApiBaseResponse(200, GetMicroserviceResponseDto, "Объект микросервиса"),
+        ApiErrorResponse(400, "GetMicroserviceBadRequest", "Microservice not found!", "Микросервис не найден"),
+    );
+```
+
+#### Пример: entity.controller.ts
+
+```typescript
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { MicroserviceService } from "./microservice.service";
+import { CreateMicroserviceDto } from "./dto/create-microservice.dto";
+import { Authorization } from "@/modules/auth/decorators/auth.decorator";
+import { Authorized } from "@/modules/auth/decorators/authorized.decorator";
+import { ApiCreateMicroservice, ApiGetMicroservice } from "./microservice.swagger";
+
+@ApiTags("microservice")
+@Controller("/v1/microservice")
+export class MicroserviceController {
+    constructor(private readonly microserviceService: MicroserviceService) {}
+
+    @ApiCreateMicroservice()
+    @Authorization()
+    @HttpCode(HttpStatus.OK)
+    @Post()
+    create(@Body() dto: CreateMicroserviceDto) {
+        return this.microserviceService.create(dto);
+    }
+
+    @ApiGetMicroservice()
+    @Authorization()
+    @HttpCode(HttpStatus.OK)
+    @Get(":id")
+    findOne(@Authorized("id") userId: string, @Param() dto: GetMicroserviceDto) {
+        return this.microserviceService.findOne(dto, userId);
+    }
+}
+```
+
+#### Пример: entity.service.ts
+
+```typescript
+import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { CreateMicroserviceDto } from "./dto/create-microservice.dto";
+import { PrismaService } from "@/modules/prisma/prisma.service";
+import { isExistById } from "@/common/utils/check-exist";
+
+@Injectable()
+export class MicroserviceService {
+    public constructor(private readonly prismaService: PrismaService) {}
+
+    async create(dto: CreateMicroserviceDto) {
+        if (!(await isExistById(this.prismaService.project, dto.projectId))) {
+            throw new BadRequestException("Project not found!");
+        }
+
+        const microserviceExist = await this.prismaService.microservice.findFirst({
+            where: {
+                projectId: dto.projectId,
+                name: dto.name,
+            },
+        });
+
+        if (microserviceExist) {
+            throw new ConflictException("The microservice already exists!");
+        }
+
+        const microservice = await this.prismaService.microservice.create({
+            data: {
+                name: dto.name,
+                type: dto.type,
+                projectId: dto.projectId ?? null,
+                isUpdateByGetScheme: dto.isUpdateByGetScheme,
+            },
+        });
+
+        // Всегда возвращаем объект с именованной сущностью
+        return { microservice };
+    }
+
+    async findOne(dto: GetMicroserviceDto, userId: string) {
+        const microservice = await this.prismaService.microservice.findUnique({
+            where: { id: dto.id },
+        });
+
+        if (!microservice) {
+            throw new BadRequestException("Microservice not found!");
+        }
+
+        // Всегда возвращаем объект с именованной сущностью
+        return { microservice };
+    }
+}
+```
+
+#### Пример: entity.module.ts
+
+```typescript
+import { Module } from "@nestjs/common";
+import { MicroserviceService } from "./microservice.service";
+import { MicroserviceController } from "./microservice.controller";
+
+@Module({
+    controllers: [MicroserviceController],
+    providers: [MicroserviceService],
+})
+export class MicroserviceModule {}
+```
+
+**Ключевые принципы:**
+
+1. Всегда используй `PickType` для DTO, наследуясь от Entity
+2. Все Response DTO должны содержать объект с именованной сущностью (не голую сущность)
+3. Swagger документация выносится в отдельный файл `entity.swagger.ts`
+4. Все описания в Swagger на русском, сообщения ошибок на английском
+5. Entity содержит полное описание всех полей с `@ApiProperty` и валидаторами из `class-validator`
