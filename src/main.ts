@@ -31,6 +31,7 @@ async function bootstrap() {
             "https://swagger-provider.com",
             /\.pincode-infra\.ru$/,
             "http://51.250.91.179",
+            "https://192.168.1.219:5005",
         ],
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],
