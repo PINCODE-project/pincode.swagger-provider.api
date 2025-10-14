@@ -5,19 +5,27 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserService } from "./user.service";
 import { Authorized } from "@/modules/auth/decorators/authorized.decorator";
 import { Authorization } from "@/modules/auth/decorators/auth.decorator";
-import { ApiGetProfile, ApiUpdateProfile } from "./user.swagger";
+import { ApiGetProfile, ApiGetUser, ApiUpdateProfile } from "./user.swagger";
 
 @ApiTags("user")
 @Controller("/v1/user")
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
+    @ApiGetUser()
+    @Authorization()
+    @HttpCode(HttpStatus.OK)
+    @Get()
+    findById(@Authorized("id") userId: string) {
+        return this.userService.findById(userId);
+    }
+
     @ApiGetProfile()
     @Authorization()
     @HttpCode(HttpStatus.OK)
     @Get("profile")
-    findProfile(@Authorized("id") userId: string) {
-        return this.userService.findById(userId);
+    getProfile(@Authorized("id") userId: string) {
+        return this.userService.getProfile(userId);
     }
 
     @ApiUpdateProfile()

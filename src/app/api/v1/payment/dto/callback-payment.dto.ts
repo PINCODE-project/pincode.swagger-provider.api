@@ -1,5 +1,4 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { PaymentType } from "@prisma";
 
 export class YookassaCallbackDto {
     @ApiProperty()

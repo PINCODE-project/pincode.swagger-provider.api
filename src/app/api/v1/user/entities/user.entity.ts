@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { AuthMethod, UserRole } from "@prisma";
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { Subscription } from "./subscription.entity";
+import { TelegramAccount } from "@/api/v1/telegram-account/entities/telegram-account.entity";
 
 export class User {
     @ApiProperty({
@@ -65,6 +67,23 @@ export class User {
     })
     @IsEnum(AuthMethod)
     method: AuthMethod;
+
+    @ApiProperty({
+        type: () => Subscription,
+        description: "Подписка пользователя",
+        required: false,
+    })
+    @IsOptional()
+    subscription?: Subscription | null;
+
+    @ApiProperty({
+        type: () => TelegramAccount,
+        description: "Подключенные телеграм-аккаунты",
+        required: false,
+        isArray: true,
+    })
+    @IsOptional()
+    telegramAccounts?: TelegramAccount[];
 
     @ApiProperty({
         type: "string",

@@ -1,9 +1,17 @@
-import { BadRequestException, ConflictException, forwardRef, Inject, Injectable } from "@nestjs/common";
+import {
+    BadRequestException,
+    ConflictException,
+    forwardRef,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "@/modules/prisma/prisma.service";
 import { CreateTelegramAccountCodeDto } from "@/api/v1/telegram-account/dto/create-telegram-account-code.dto";
 import * as crypto from "crypto";
 import { ConnectUserToTelegramDto } from "@/api/v1/telegram-account/dto/connect-user-to-telegram.dto";
 import { BotService } from "@/bot/bot.service";
+import { DisconnectTelegramDto } from "@/api/v1/telegram-account/dto/disconnect-telegram.dto";
 
 @Injectable()
 export class TelegramAccountService {
@@ -85,5 +93,26 @@ export class TelegramAccountService {
         await this.botService.successConnect(code.telegramId);
 
         return { account };
+    }
+
+    async disconnectTelegram(userId: string, dto: DisconnectTelegramDto) {
+        const account = await this.prismaService.userTelegramAccounts.findFirst({
+            where: {
+                id: dto.id,
+                userId: userId,
+            },
+        });
+
+        if (!account) {
+            throw new NotFoundException("Telegram account not found!");
+        }
+
+        await this.prismaService.userTelegramAccounts.delete({
+            where: {
+                id: dto.id,
+            },
+        });
+
+        return { message: "Telegram account disconnected successfully" };
     }
 }

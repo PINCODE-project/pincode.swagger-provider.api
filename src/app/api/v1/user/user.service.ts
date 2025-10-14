@@ -22,6 +22,31 @@ export class UserService {
         return { user };
     }
 
+    public async getProfile(id: string) {
+        const user = await this.prismaService.user.findUnique({
+            where: { id },
+            include: {
+                accounts: true,
+                subscription: true,
+                telegram_accounts: true,
+            },
+        });
+
+        if (!user) {
+            throw new NotFoundException("User not found!");
+        }
+
+        // Преобразуем telegram_accounts в telegramAccounts для соответствия entity
+        const { telegram_accounts, ...userData } = user;
+
+        return {
+            user: {
+                ...userData,
+                telegramAccounts: telegram_accounts,
+            },
+        };
+    }
+
     public async findByEmail(email: string) {
         return this.prismaService.user.findUnique({
             where: {
