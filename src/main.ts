@@ -32,6 +32,7 @@ async function bootstrap() {
             /\.pincode-infra\.ru$/,
             "http://51.250.91.179",
             "https://192.168.1.219:5005",
+            "http://192.168.1.219:5005",
         ],
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],
