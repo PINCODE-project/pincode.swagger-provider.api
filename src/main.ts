@@ -26,6 +26,8 @@ async function bootstrap() {
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         origin: [
             "https://localhost:3000",
+            "http://localhost:1420",
+            "https://localhost:1420",
             "http://localhost:3000",
             "http://localhost:5001",
             "https://swagger-provider.com",
