@@ -33,7 +33,7 @@ import { MicroserviceModule } from "@/api/v1/microservice/microservice.module";
         }),
         TerminusModule,
         PrismaModule,
-        BotModule,
+        BotModule.register(),
         AuthModule,
         UserModule,
         ProviderModule,
